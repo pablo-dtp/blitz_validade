@@ -5,10 +5,10 @@ class ManagePeoplePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _buildManagePeoplePage();
+    return _buildManagePeoplePage(context);
   }
 
-  Widget _buildManagePeoplePage() {
+  Widget _buildManagePeoplePage(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -24,10 +24,20 @@ class ManagePeoplePage extends StatelessWidget {
             backgroundColor: AppColors.primaryColor,
             title: Center(
               child: Image.asset('assets/logo.png', width: 80, height: 80),
-              ),
             ),
-          ],
-        ), // Customize here
-      );
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AddUserPage()),
+              );
+            },
+            child: const Text("Adicionar Novo Usuário"),
+          ),
+        ],
+      ),
+    );
   }
 }

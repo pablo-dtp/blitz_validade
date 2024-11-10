@@ -1,4 +1,5 @@
 import 'imports.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,10 +18,44 @@ class _HomePageState extends State<HomePage> {
     SettingsPage(),
   ];
 
-  void _onItemTapped(int index) {
+  void _onItemTapped(int index) async {
+    if (index == 2) {
+      // Verifica permissão antes de acessar a ManagePeoplePage
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      int permissionLevel = prefs.getInt('permission_level') ?? 0;
+      // Exibe o permission_level no console para debug
+      print('Permission Level: $permissionLevel');
+      if (permissionLevel < 3) {
+        // Exibe alerta se o usuário não tiver permissão
+        _showPermissionAlert();
+        return;
+      }
+    }
+
+    // Permite mudar a página normalmente
     setState(() {
       _currentIndex = index;
     });
+  }
+
+  void _showPermissionAlert() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Acesso negado"),
+          content: const Text("Você não possui permissão para acessar esta página."),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop(); // Fecha o alerta
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -33,7 +68,7 @@ class _HomePageState extends State<HomePage> {
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(icon: Icon(Icons.add_shopping_cart), label: 'Registrar Validade'),
             BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Gerenciar Validades'),
-            BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Gerenciar Usuarios'),
+            BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Gerenciar Usuários'),
             BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Configurações'),
           ],
           currentIndex: _currentIndex,
