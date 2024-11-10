@@ -9,9 +9,11 @@ class UserTable extends StatefulWidget {
   _UserTableState createState() => _UserTableState();
 
   // Método público para atualizar os dados da tabela
-  void refreshTable() {
-    _UserTableState? state = this.createState();
-    state._fetchUsers(); // Chama a função de atualizar dados
+  void refreshTable(BuildContext context) {
+    _UserTableState? state = context.findAncestorStateOfType<_UserTableState>();
+    if (state != null) {
+      state._fetchUsers(); // Chama a função de atualizar dados
+    }
   }
 }
 
@@ -35,7 +37,16 @@ class _UserTableState extends State<UserTable> {
         final responseBody = json.decode(response.body);
         setState(() {
           users = List<Map<String, dynamic>>.from(responseBody['users']);
-          users.sort((a, b) => a['name'].compareTo(b['name']));
+          // Mantém a ordenação atual
+          if (selectedFilter == "name") {
+            users.sort((a, b) => isNameAscending
+                ? a['name'].compareTo(b['name'])
+                : b['name'].compareTo(a['name']));
+          } else if (selectedFilter == "permission_level") {
+            users.sort((a, b) => isPermissionAscending
+                ? a['permission_level'].compareTo(b['permission_level'])
+                : b['permission_level'].compareTo(a['permission_level']));
+          }
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -102,6 +113,59 @@ class _UserTableState extends State<UserTable> {
     });
   }
 
+  // Função para atualizar o usuário
+  Future<void> _updateUser(int userId, String name, int permissionLevel) async {
+    try {
+      final response = await http.put(
+        Uri.parse('http://10.0.2.2:5000/update_user/$userId'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'name': name,
+          'permission_level': permissionLevel,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Usuário atualizado com sucesso!')),
+        );
+        _fetchUsers(); // Atualiza a tabela
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao atualizar o usuário')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao fazer requisição: $e')),
+      );
+    }
+  }
+
+  // Função para deletar o usuário
+  Future<void> _deleteUser(int userId) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('http://10.0.2.2:5000/delete_user/$userId'),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Usuário deletado com sucesso!')),
+        );
+        _fetchUsers(); // Atualiza a tabela
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao deletar o usuário')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao fazer requisição: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return _buildUserTable();
@@ -122,7 +186,7 @@ class _UserTableState extends State<UserTable> {
           ),
         ],
       ),
-      child: Container(
+      child: SizedBox(
         // Limita a altura da tabela a 60% da altura da tela
         height: MediaQuery.of(context).size.height * 0.6,
         child: SingleChildScrollView(
@@ -220,6 +284,7 @@ class _UserTableState extends State<UserTable> {
                                             ),
                                             onTap: () {
                                               // Ação de editar usuário
+                                              _showEditDialog(user);
                                             },
                                           ),
                                           ListTile(
@@ -230,6 +295,7 @@ class _UserTableState extends State<UserTable> {
                                             ),
                                             onTap: () {
                                               // Ação de deletar usuário
+                                              _deleteUser(user['id']);
                                             },
                                           ),
                                         ],
@@ -247,6 +313,59 @@ class _UserTableState extends State<UserTable> {
           ),
         ),
       ),
+    );
+  }
+
+  // Função para mostrar o modal de edição
+  void _showEditDialog(Map<String, dynamic> user) {
+    TextEditingController nameController = TextEditingController(text: user['name']);
+    int permissionLevel = user['permission_level'];
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Editar Usuário'),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(labelText: 'Nome'),
+              ),
+              DropdownButton<int>(
+                value: permissionLevel,
+                onChanged: (int? newValue) {
+                  setState(() {
+                    permissionLevel = newValue!;
+                  });
+                },
+                items: [
+                  DropdownMenuItem(child: Text('Repositor'), value: 1),
+                  DropdownMenuItem(child: Text('Gerente'), value: 2),
+                  DropdownMenuItem(child: Text('Admin'), value: 3),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                _updateUser(user['id'], nameController.text, permissionLevel);
+                Navigator.pop(context);
+              },
+              child: Text('Salvar'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

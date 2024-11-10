@@ -1,6 +1,6 @@
 import 'imports.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';// Importando para usar o TextInputFormatter
+import 'dart:convert';
 
 class AddUserPage extends StatefulWidget {
   const AddUserPage({super.key});
@@ -14,7 +14,7 @@ class _AddUserPageState extends State<AddUserPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
-  int? selectedPermissionLevel;  // Armazenar o nível de permissão selecionado
+  int? selectedPermissionLevel;
 
   bool isButtonEnabled = false;
 
@@ -62,9 +62,9 @@ class _AddUserPageState extends State<AddUserPage> {
         'Password': 'root',  // Substitua com a senha correta
       },
       body: json.encode({
-        'username': usernameController.text.toLowerCase(), // Convertendo username para minúsculas
-        'password': passwordController.text.toLowerCase(), // Convertendo password para minúsculas
-        'name': formatName(nameController.text), // Formatando nome
+        'username': usernameController.text.toLowerCase(),
+        'password': passwordController.text.toLowerCase(),
+        'name': formatName(nameController.text),
         'permission_level': selectedPermissionLevel,
       }),
     );
@@ -83,8 +83,11 @@ class _AddUserPageState extends State<AddUserPage> {
       passwordController.clear();
       nameController.clear();
       setState(() {
-        selectedPermissionLevel = null;  // Limpa a seleção do permission level
+        selectedPermissionLevel = null;
       });
+
+      // Retorna à página anterior e sinaliza que a lista precisa ser atualizada
+      Navigator.pop(context, true);  // Envia 'true' para a página anterior para atualizar a lista
     } else {
       final responseBody = json.decode(response.body);
       final String errorMessage = responseBody['message'];
