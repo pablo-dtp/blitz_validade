@@ -44,8 +44,8 @@ class _LoginPageState extends State<LoginPage> {
       Uri.parse('http://10.0.2.2:5000/login'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
-        'username': usernameController.text,
-        'password': passwordController.text,
+        'username': usernameController.text.toLowerCase(),  // Convertendo para minúsculas
+        'password': passwordController.text.toLowerCase(),
       }),
     );
 
@@ -137,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                   style: TextStyle(color: Colors.red),
                 ),
               ),
-            _buildTextField(usernameController, 'Nome'),
+            _buildTextField(usernameController, 'Usuário'),
             const SizedBox(height: 20),
             _buildPasswordField(),
             const SizedBox(height: 10),
@@ -160,9 +160,14 @@ class _LoginPageState extends State<LoginPage> {
           border: OutlineInputBorder(),
           labelStyle: TextStyle(color: AppColors.secondaryColor),
         ),
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')), // Permite apenas letras
+        ],
       ),
     );
   }
+
+
 
   Widget _buildPasswordField() {
     return Padding(

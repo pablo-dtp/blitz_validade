@@ -1,7 +1,6 @@
 import 'imports.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:flutter/services.dart'; // Importando para usar o TextInputFormatter
+import 'dart:convert';// Importando para usar o TextInputFormatter
 
 class AddUserPage extends StatefulWidget {
   const AddUserPage({super.key});
@@ -37,6 +36,22 @@ class _AddUserPageState extends State<AddUserPage> {
     });
   }
 
+  // Função para formatar o nome (primeira letra de cada palavra em maiúscula, exceto preposições)
+  String formatName(String name) {
+    List<String> prepositions = ['de', 'da', 'do', 'das', 'dos', 'e', 'a', 'o', 'as', 'os', 'para', 'com'];
+    return name
+        .split(' ') // Divide o nome em palavras
+        .map((word) {
+          if (prepositions.contains(word.toLowerCase())) {
+            return word.toLowerCase(); // Mantém as preposições em minúsculas
+          } else {
+            return word.isNotEmpty
+                ? word[0].toUpperCase() + word.substring(1).toLowerCase() // Primeira letra em maiúscula e o restante em minúscula
+                : ''; // Caso a palavra esteja vazia
+          }
+        }).join(' '); // Junta as palavras de volta com espaço
+  }
+
   // Função para enviar o novo usuário para o servidor
   Future<void> _addUser() async {
     final response = await http.post(
@@ -47,9 +62,9 @@ class _AddUserPageState extends State<AddUserPage> {
         'Password': 'root',  // Substitua com a senha correta
       },
       body: json.encode({
-        'username': usernameController.text,
-        'password': passwordController.text,
-        'name': nameController.text,
+        'username': usernameController.text.toLowerCase(), // Convertendo username para minúsculas
+        'password': passwordController.text.toLowerCase(), // Convertendo password para minúsculas
+        'name': formatName(nameController.text), // Formatando nome
         'permission_level': selectedPermissionLevel,
       }),
     );
@@ -88,6 +103,7 @@ class _AddUserPageState extends State<AddUserPage> {
           decoration: BoxDecoration(color: AppColors.primaryColor), // Alterando fundo para a cor primária
           child: Stack(
             children: [
+              _buildBackButton(), // Botão de voltar adicionado aqui
               _buildLogo(),
               _buildAddUserForm(),
             ],
@@ -97,10 +113,42 @@ class _AddUserPageState extends State<AddUserPage> {
     );
   }
 
+  // Função para construir o botão de voltar
+  Widget _buildBackButton() {
+    return Positioned(
+      top: 40, // Ajuste a posição do botão de volta
+      left: 20, // Colocando o botão do lado esquerdo
+      child: GestureDetector(
+        onTap: () {
+          Navigator.pop(context); // Retorna para a página anterior
+        },
+        child: Container(
+          padding: const EdgeInsets.all(8.0), // Tamanho do círculo
+          decoration: BoxDecoration(
+            color: Colors.white, // Cor de fundo do círculo
+            shape: BoxShape.circle, // Forma circular
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 5,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Icon(
+            Icons.arrow_back, // Ícone da seta para a esquerda
+            color: AppColors.primaryColor, // Cor da seta (usando a cor do fundo)
+            size: 24, // Tamanho do ícone
+          ),
+        ),
+      ),
+    );
+  }
+
   // Função para construir a logo
   Widget _buildLogo() {
     return Positioned(
-      top: 40,
+      top: 100, // Ajusta a posição da logo para que o botão de voltar não a cubra
       left: 0,
       right: 0,
       child: Center(
@@ -165,7 +213,7 @@ class _AddUserPageState extends State<AddUserPage> {
           border: const OutlineInputBorder(),
         ),
         inputFormatters: isUserField 
-            ? [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z ]'))] // Permite apenas letras, números e underscore para o usuário
+            ? [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]'))] // Permite apenas letras, números e underscore para o usuário
             : label == 'Senha'
                 ? [] // Sem restrição para a senha
                 : [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z ]'))], // Permite apenas letras e espaços para o nome
@@ -186,6 +234,7 @@ class _AddUserPageState extends State<AddUserPage> {
         onChanged: (int? newValue) {
           setState(() {
             selectedPermissionLevel = newValue;
+            _checkForm(); // Garantir que a verificação seja feita ao alterar o nível de permissão
           });
         },
         items: const [

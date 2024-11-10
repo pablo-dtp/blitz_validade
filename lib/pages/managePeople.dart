@@ -1,14 +1,12 @@
-import 'imports.dart';
+import 'package:flutter/material.dart';
+import 'usersView.dart';
+import 'imports.dart'; // Importando o arquivo que contém a tabela
 
 class ManagePeoplePage extends StatelessWidget {
   const ManagePeoplePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return _buildManagePeoplePage(context);
-  }
-
-  Widget _buildManagePeoplePage(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -27,7 +25,15 @@ class ManagePeoplePage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
+          const UserTable(), // Aqui usamos o widget da tabela
+          const SizedBox(height: 20), // Espaçamento entre a tabela e o botão
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.auxiliaryColor, // Cor de fundo do botão
+              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30), // Padding do botão
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)), // Borda sem arredondamento
+              foregroundColor: AppColors.primaryColor, // Cor do texto do botão
+            ),
             onPressed: () {
               Navigator.push(
                 context,

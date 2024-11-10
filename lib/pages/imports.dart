@@ -8,3 +8,4 @@ export 'managePeople.dart';
 export 'settings.dart';
 export 'addUsersPage.dart';
 export '../style/colors.dart';
+export 'package:flutter/services.dart';
