@@ -225,8 +225,9 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildRememberMeCheckbox() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center, // Garante alinhamento central
         children: [
           Checkbox(
             value: rememberMe,
@@ -248,23 +249,38 @@ class _LoginPageState extends State<LoginPage> {
             checkColor: AppColors.auxiliaryColor,
             activeColor: AppColors.effectColor,
           ),
-          const Text('Continuar conectado'),
+          SizedBox(width: 0), // Ajusta o espaçamento entre o checkbox e o texto
+          const Text(
+            'Continuar conectado',
+            //style: TextStyle(fontSize: 16), // Ajusta o tamanho da fonte, se necessário
+          ),
         ],
       ),
     );
   }
 
+
+
   Widget _buildLoginButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: ElevatedButton.icon(
-        onPressed: isButtonEnabled ? _login : null,
-        icon: const Icon(Icons.login, color: AppColors.auxiliaryColor),
-        label: const Text('Entrar', style: TextStyle(color: AppColors.auxiliaryColor)),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isButtonEnabled ? AppColors.effectColor : const Color(0xFFB8B4B4),
-          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 120),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: SizedBox(
+        width: double.infinity, // Ocupa toda a largura disponível
+        child: ElevatedButton.icon(
+          onPressed: isButtonEnabled ? _login : null,
+          icon: const Icon(Icons.login, color: AppColors.auxiliaryColor),
+          label: const Text(
+            'Entrar',
+            style: TextStyle(
+              color: AppColors.auxiliaryColor,
+              overflow: TextOverflow.ellipsis, // Previne que o texto quebre
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: isButtonEnabled ? AppColors.effectColor : const Color(0xFFB8B4B4),
+            padding: const EdgeInsets.symmetric(vertical: 15),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
         ),
       ),
     );
