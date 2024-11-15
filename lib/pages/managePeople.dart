@@ -62,42 +62,44 @@ class _ManagePeoplePageState extends State<ManagePeoplePage> {
             stops: const [0.1, 0.6],
           ),
         ),
-        child: Column(
-          children: [
-            AppBar(
-              backgroundColor: AppColors.primaryColor,
-              title: Center(
-                child: Image.asset('assets/logo.png', width: 80, height: 80),
+        child: SingleChildScrollView(  // Adicionando o SingleChildScrollView
+          child: Column(
+            children: [
+              AppBar(
+                backgroundColor: AppColors.primaryColor,
+                title: Center(
+                  child: Image.asset('assets/logo.png', width: 80, height: 80),
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            // Tabela de usuários ou indicador de carregamento
-            isLoading
-                ? const CircularProgressIndicator() // Mostrar o loading
-                : const UserTable(), // Tabela de usuários
+              const SizedBox(height: 20),
+              // Tabela de usuários ou indicador de carregamento
+              isLoading
+                  ? const CircularProgressIndicator() // Mostrar o loading
+                  : const UserTable(), // Tabela de usuários
 
-            const SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.auxiliaryColor,
-                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
-                foregroundColor: AppColors.primaryColor,
+              const SizedBox(height: 20),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.auxiliaryColor,
+                  padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+                  foregroundColor: AppColors.primaryColor,
+                ),
+                onPressed: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AddUserPage()),
+                  );
+
+                  // Após retornar da tela de adicionar usuário, recarregar a lista
+                  if (result == true) {
+                    _loadUsers(); // Recarregar a lista de usuários
+                  }
+                },
+                child: const Text("Adicionar Novo Usuário"),
               ),
-              onPressed: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AddUserPage()),
-                );
-
-                // Após retornar da tela de adicionar usuário, recarregar a lista
-                if (result == true) {
-                  _loadUsers(); // Recarregar a lista de usuários
-                }
-              },
-              child: const Text("Adicionar Novo Usuário"),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

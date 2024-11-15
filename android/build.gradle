@@ -1,3 +1,16 @@
+// Configurações do repositório e repositórios de dependências
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // Certifique-se de que a versão do plugin seja compatível com o Gradle 8.3
+        classpath 'com.android.tools.build:gradle:8.0.0'  // Verifique a versão aqui
+    }
+}
+
+
 allprojects {
     repositories {
         google()
@@ -5,14 +18,14 @@ allprojects {
     }
 }
 
+// Configurações para os subprojetos
 rootProject.buildDir = "../build"
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
     project.evaluationDependsOn(":app")
 }
 
+// Tarefa de limpeza
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }

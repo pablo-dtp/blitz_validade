@@ -6,14 +6,14 @@ class UpdateUser extends StatefulWidget {
   final int userId;
   final String currentName;
   final int currentPermissionLevel;
-  final Function refreshUsers;  // Função para recarregar os usuários
+  final Function refreshUsers;
 
   const UpdateUser({
     super.key,
     required this.userId,
     required this.currentName,
     required this.currentPermissionLevel,
-    required this.refreshUsers,  // Recebe a função de recarregar usuários
+    required this.refreshUsers,
   });
 
   @override
@@ -23,6 +23,8 @@ class UpdateUser extends StatefulWidget {
 class _UpdateUserState extends State<UpdateUser> {
   late TextEditingController _nameController;
   int _selectedPermissionLevel = 1;
+  bool _isLoading = false; // Indicador de carregamento
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -32,39 +34,61 @@ class _UpdateUserState extends State<UpdateUser> {
   }
 
   Future<void> _updateUser() async {
+    if (_nameController.text.trim().isEmpty) {
+      setState(() {
+        _errorMessage = 'O nome não pode estar vazio.';
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
     final url = Uri.parse('http://192.168.1.2:5000/update_user/${widget.userId}');
     final response = await http.put(
       url,
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
-        'name': _nameController.text,
+        'name': _nameController.text.trim(),
         'permission_level': _selectedPermissionLevel,
       }),
     );
 
+    setState(() {
+      _isLoading = false;
+    });
+
     if (response.statusCode == 200) {
-      // Exibe um Snackbar de sucesso
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Usuário atualizado')));
-      
-      // Chama a função de recarregar os usuários
-      widget.refreshUsers();  // Recarrega a lista de usuários após a atualização
+      // Mostra mensagem de sucesso e atualiza a lista de usuários
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Usuário atualizado com sucesso')),
+      );
+      widget.refreshUsers();
+      Navigator.pop(context); // Fecha o diálogo somente após sucesso
     } else {
-      // Exibe um Snackbar de erro
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao atualizar usuário')));
+      setState(() {
+        _errorMessage = 'Erro ao atualizar usuário: ${response.body}';
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_errorMessage!)),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Editar Usuário'),
+      title: const Text('Editar Usuário'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
             controller: _nameController,
-            decoration: InputDecoration(labelText: 'Nome Completo'),
+            decoration: const InputDecoration(labelText: 'Nome Completo'),
           ),
+          const SizedBox(height: 10),
           DropdownButton<int>(
             value: _selectedPermissionLevel,
             onChanged: (newValue) {
@@ -72,12 +96,20 @@ class _UpdateUserState extends State<UpdateUser> {
                 _selectedPermissionLevel = newValue!;
               });
             },
-            items: [
+            items: const [
               DropdownMenuItem(value: 1, child: Text('Repositor')),
               DropdownMenuItem(value: 2, child: Text('Gerente')),
               DropdownMenuItem(value: 3, child: Text('Admin')),
             ],
           ),
+          if (_errorMessage != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Text(
+                _errorMessage!,
+                style: const TextStyle(color: Colors.red),
+              ),
+            ),
         ],
       ),
       actions: [
@@ -85,14 +117,20 @@ class _UpdateUserState extends State<UpdateUser> {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: Text('Cancelar'),
+          child: const Text('Cancelar'),
         ),
         ElevatedButton(
-          onPressed: () {
-            _updateUser();
-            Navigator.pop(context);
-          },
-          child: Text('Salvar'),
+          onPressed: _isLoading ? null : _updateUser, // Desabilita botão durante carregamento
+          child: _isLoading
+              ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : const Text('Salvar'),
         ),
       ],
     );
