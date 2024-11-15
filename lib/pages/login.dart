@@ -7,7 +7,6 @@ class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _LoginPageState createState() => _LoginPageState();
 }
 
@@ -24,6 +23,7 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     usernameController.addListener(_checkForm);
     passwordController.addListener(_checkForm);
+    _checkSavedCredentials();
   }
 
   @override
@@ -44,34 +44,67 @@ class _LoginPageState extends State<LoginPage> {
       Uri.parse('http://10.0.2.2:5000/login'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
-        'username': usernameController.text.toLowerCase(),  // Convertendo para minúsculas
+        'username': usernameController.text.toLowerCase(),
         'password': passwordController.text.toLowerCase(),
       }),
     );
 
     if (response.statusCode == 200) {
       if (mounted) {
-        // Parse a resposta para pegar o permission_level
         final responseBody = json.decode(response.body);
         final permissionLevel = responseBody['permission_level'];
 
-        // Armazenar o permission_level usando SharedPreferences
+        // Armazenar dados com SharedPreferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setInt('permission_level', permissionLevel);
 
+        // Armazenar as credenciais e o estado do "Continuar Conectado"
+        if (rememberMe) {
+          prefs.setString('username', usernameController.text);
+          prefs.setString('password', passwordController.text);
+          prefs.setBool('remember_me', rememberMe);  // Salvar o estado do checkbox
+        } else {
+          prefs.remove('username');
+          prefs.remove('password');
+        }
+
         // Navegar para a HomePage
         Navigator.pushReplacement(
-          // ignore: use_build_context_synchronously
           context,
-          MaterialPageRoute(builder: (context) => const HomePage()), // Redireciona para a HomePage
+          MaterialPageRoute(builder: (context) => const HomePage()),
         );
       }
     } else {
+      // Se o login falhar, apaga as credenciais salvas
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.remove('username');
+      prefs.remove('password');
+      prefs.remove('remember_me');
+
       if (mounted) {
         setState(() {
           errorMessage = json.decode(response.body)['message'];
         });
       }
+    }
+  }
+
+  // Verificar se há credenciais e o estado do "Continuar conectado" salvos
+  Future<void> _checkSavedCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? savedUsername = prefs.getString('username');
+    String? savedPassword = prefs.getString('password');
+    bool? savedRememberMe = prefs.getBool('remember_me');
+
+    if (savedUsername != null && savedPassword != null) {
+      // Preencher os campos com as credenciais salvas
+      usernameController.text = savedUsername;
+      passwordController.text = savedPassword;
+
+      // Restaurar o estado do "Continuar conectado"
+      setState(() {
+        rememberMe = savedRememberMe ?? false;  // Caso não exista, assume como false
+      });
     }
   }
 
@@ -167,8 +200,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-
-
   Widget _buildPasswordField() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -199,10 +230,20 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           Checkbox(
             value: rememberMe,
-            onChanged: (value) {
+            onChanged: (value) async {
               setState(() {
                 rememberMe = value!;
               });
+
+              // Armazenar o estado do "Continuar conectado"
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              prefs.setBool('remember_me', rememberMe);
+
+              if (!rememberMe) {
+                // Remover credenciais se a opção for desmarcada
+                prefs.remove('username');
+                prefs.remove('password');
+              }
             },
             checkColor: AppColors.auxiliaryColor,
             activeColor: AppColors.effectColor,

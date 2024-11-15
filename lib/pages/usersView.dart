@@ -342,9 +342,9 @@ class _UserTableState extends State<UserTable> {
                   });
                 },
                 items: [
-                  DropdownMenuItem(child: Text('Repositor'), value: 1),
-                  DropdownMenuItem(child: Text('Gerente'), value: 2),
-                  DropdownMenuItem(child: Text('Admin'), value: 3),
+                  DropdownMenuItem(value: 1, child: Text('Repositor')),
+                  DropdownMenuItem(value: 2, child: Text('Gerente')),
+                  DropdownMenuItem(value: 3, child: Text('Admin')),
                 ],
               ),
             ],

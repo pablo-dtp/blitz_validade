@@ -27,7 +27,7 @@ class SettingsPage extends StatelessWidget {
             ),
           ),
           Expanded(child: Container()), // Expande para ocupar espaço e empurrar o botão para baixo
-          _buildLogoutButton(context), // Adiciona o botão "SAIR"
+          _buildLogoutButton(context),
         ],
       ),
     );
@@ -37,17 +37,17 @@ class SettingsPage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: ElevatedButton.icon(
-        onPressed: () {
-          // Aqui você pode adicionar a lógica para desconectar o usuário
+        onPressed: () async {
+          // Não remover as credenciais ao sair
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const LoginPage()),
           );
         },
-        icon: Icon(Icons.logout, color: AppColors.primaryColor), // Define a cor do ícone
+        icon: Icon(Icons.logout, color: AppColors.primaryColor),
         label: Text(
           'SAIR',
-          style: TextStyle(color: AppColors.primaryColor), // Define a cor do texto
+          style: TextStyle(color: AppColors.primaryColor),
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.auxiliaryColor,

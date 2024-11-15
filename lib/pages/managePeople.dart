@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'addUsersPage.dart';
 import 'usersView.dart';
 import 'package:http/http.dart' as http;
@@ -8,6 +7,7 @@ class ManagePeoplePage extends StatefulWidget {
   const ManagePeoplePage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ManagePeoplePageState createState() => _ManagePeoplePageState();
 }
 
