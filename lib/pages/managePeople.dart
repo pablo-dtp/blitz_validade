@@ -27,7 +27,7 @@ class _ManagePeoplePageState extends State<ManagePeoplePage> {
     });
 
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:5000/get_users'));
+      final response = await http.get(Uri.parse('http://192.168.1.2:5000/get_users'));
       if (response.statusCode == 200) {
         setState(() {
           isLoading = false; // Atualização completada

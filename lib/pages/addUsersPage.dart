@@ -55,7 +55,7 @@ class _AddUserPageState extends State<AddUserPage> {
   // Função para enviar o novo usuário para o servidor
   Future<void> _addUser() async {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:5000/add_user'),
+      Uri.parse('http://192.168.1.2:5000/add_user'),
       headers: {
         'Content-Type': 'application/json',
         'Username': 'admin_role',  // Substitua com o username correto

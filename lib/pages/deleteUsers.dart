@@ -8,7 +8,7 @@ class DeleteUser extends StatelessWidget {
   const DeleteUser({super.key, required this.userId, required this.refreshUsers});
 
   Future<void> _deleteUser(BuildContext context) async {
-    final url = Uri.parse('http://10.0.2.2:5000/delete_user/$userId');
+    final url = Uri.parse('http://192.168.1.2:5000/delete_user/$userId');
     final response = await http.delete(url);
 
     if (response.statusCode == 200) {

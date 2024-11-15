@@ -32,7 +32,7 @@ class _UpdateUserState extends State<UpdateUser> {
   }
 
   Future<void> _updateUser() async {
-    final url = Uri.parse('http://10.0.2.2:5000/update_user/${widget.userId}');
+    final url = Uri.parse('http://192.168.1.2:5000/update_user/${widget.userId}');
     final response = await http.put(
       url,
       headers: {'Content-Type': 'application/json'},

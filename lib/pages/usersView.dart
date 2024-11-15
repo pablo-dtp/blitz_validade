@@ -31,7 +31,7 @@ class _UserTableState extends State<UserTable> {
 
   Future<void> _fetchUsers() async {
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:5000/get_users'));
+      final response = await http.get(Uri.parse('http://192.168.1.2:5000/get_users'));
 
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);
@@ -117,7 +117,7 @@ class _UserTableState extends State<UserTable> {
   Future<void> _updateUser(int userId, String name, int permissionLevel) async {
     try {
       final response = await http.put(
-        Uri.parse('http://10.0.2.2:5000/update_user/$userId'),
+        Uri.parse('http://192.168.1.2:5000/update_user/$userId'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'name': name,
@@ -146,7 +146,7 @@ class _UserTableState extends State<UserTable> {
   Future<void> _deleteUser(int userId) async {
     try {
       final response = await http.delete(
-        Uri.parse('http://10.0.2.2:5000/delete_user/$userId'),
+        Uri.parse('http://192.168.1.2:5000/delete_user/$userId'),
       );
 
       if (response.statusCode == 200) {
