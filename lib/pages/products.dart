@@ -10,14 +10,7 @@ class ManageProductsPage extends StatelessWidget {
 
   Widget _buildManageProductsPage() {
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: const [AppColors.primaryColor, AppColors.auxiliaryColor],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          stops: const [0.1, 0.6],
-        ),
-      ),
+      decoration: const BoxDecoration(color: AppColors.primaryColor),
       child: Column(
         children: [
           AppBar(

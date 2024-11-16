@@ -13,12 +13,16 @@ class _AddProductPageState extends State<AddProductPage> {
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _packagingController = TextEditingController(text: '1');
   final TextEditingController _expiryDateController = TextEditingController();
+  
+  late double firstContainerTopPosition;
+  late double firstContainerLeftPosition;
+  late double firstContainerRightPosition;
 
   String _productName = '';
   String _productDescription = '';
   String _productBarcode = '';
   String _expiryDate = '';
-  
+
   bool _isProductFound = false;
   bool _isQuantityFilled = false;
   bool _isPackagingFilled = false;
@@ -29,12 +33,8 @@ class _AddProductPageState extends State<AddProductPage> {
     try {
       final response = await http.post(
         Uri.parse(url),
-        body: json.encode({
-          'codigo_barras': barcode, 
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        body: json.encode({'codigo_barras': barcode}),
+        headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -93,6 +93,16 @@ class _AddProductPageState extends State<AddProductPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final appBarHeight = AppBar().preferredSize.height;
+
+    // Agora calculamos a posição do primeiro container a 5% abaixo da AppBar
+    firstContainerTopPosition = appBarHeight + (screenHeight * 0.02); // 5% abaixo da AppBar
+
+    firstContainerLeftPosition = screenWidth * 0.05; // 5% da largura da tela
+    firstContainerRightPosition = screenWidth * 0.05;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primaryColor,
@@ -105,72 +115,66 @@ class _AddProductPageState extends State<AddProductPage> {
         ),
       ),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: const [AppColors.primaryColor, AppColors.auxiliaryColor],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            stops: const [0.1, 0.6],
-          ),
+        width: double.infinity, // Garante que o container ocupe toda a largura
+        height: screenHeight, // Garante que o container ocupe toda a altura da tela
+        decoration: const BoxDecoration(
+          color: AppColors.primaryColor, // Cor de fundo
         ),
-        child: Center(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 40),
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    height: MediaQuery.of(context).size.height * 0.09,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(13),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 8,
-                          offset: Offset(0, 15),
-                        ),
-                      ],
+        child: Stack(
+          children: [
+            // Container do código de barras
+            Positioned(
+              top: firstContainerTopPosition, // Agora a posição é 5% abaixo da AppBar
+              left: firstContainerLeftPosition,
+              right: firstContainerRightPosition,
+              child: Container(
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(13),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 8,
+                      offset: Offset(0, 15),
                     ),
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.7,
-                          child: TextField(
-                            controller: _barcodeController,
-                            decoration: InputDecoration(
-                              labelText: 'LER CÓDIGO DE BARRAS',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.black),
-                              ),
-                              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                            ),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                          ),
+                  ],
+                ),
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _barcodeController,
+                        decoration: InputDecoration(
+                          labelText: 'LER CÓDIGO DE BARRAS',
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         ),
-                        IconButton(
-                          icon: Icon(Icons.barcode_reader, size: 25, color: Colors.black),
-                          onPressed: () {
-                            final barcode = _barcodeController.text;
-                            if (barcode.isNotEmpty) {
-                              _fetchProductInfo(barcode);
-                            }
-                          },
-                        ),
-                      ],
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      ),
                     ),
-                  ),
+                    IconButton(
+                      icon: Icon(Icons.barcode_reader, size: 25, color: Colors.black),
+                      onPressed: () {
+                        final barcode = _barcodeController.text;
+                        if (barcode.isNotEmpty) {
+                          _fetchProductInfo(barcode);
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(height: 40),
-              Container(
-                width: MediaQuery.of(context).size.width * 0.9,
+            ),
+            
+            // Container das informações do produto
+            Positioned(
+              top: firstContainerTopPosition + 100, // 70 pixels abaixo do primeiro container
+              left: firstContainerLeftPosition,
+              right: firstContainerRightPosition,
+              child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
@@ -193,7 +197,7 @@ class _AddProductPageState extends State<AddProductPage> {
                     _buildDateField(),
                     SizedBox(height: 20),
                     ElevatedButton(
-                      onPressed: (_isProductFound && _isQuantityFilled && _isPackagingFilled && _isDateSelected) 
+                      onPressed: (_isProductFound && _isQuantityFilled && _isPackagingFilled && _isDateSelected)
                           ? () async {
                               final Map<String, dynamic> productData = {
                                 'produto': int.tryParse(_productName) ?? 0,
@@ -233,27 +237,27 @@ class _AddProductPageState extends State<AddProductPage> {
                                   SnackBar(content: Text('Erro ao registrar produto.')),
                                 );
                               }
-                          } 
+                          }
                           : null,
                       style: ElevatedButton.styleFrom(
                         minimumSize: Size(double.infinity, 50),
-                        backgroundColor: (_isProductFound && _isQuantityFilled && _isPackagingFilled && _isDateSelected) 
-                            ? Colors.blue 
+                        backgroundColor: (_isProductFound && _isQuantityFilled && _isPackagingFilled && _isDateSelected)
+                            ? Colors.blue
                             : Colors.grey,
                         textStyle: TextStyle(fontSize: 18),
                       ),
                       child: Text(
                         'Registrar',
                         style: TextStyle(
-                          color: Colors.white, 
+                          color: Colors.white,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -323,8 +327,7 @@ class _AddProductPageState extends State<AddProductPage> {
           TextField(
             controller: _expiryDateController,
             decoration: InputDecoration(
-              hintText: 'Escolha a data',
-              suffixIcon: Icon(Icons.calendar_today),
+              hintText: 'Escolher data',
               border: OutlineInputBorder(),
             ),
             readOnly: true,

@@ -16,7 +16,6 @@ class _ManagePeoplePageState extends State<ManagePeoplePage> {
   @override
   void initState() {
     super.initState();
-    _loadUsers();
   }
 
   Future<void> _loadUsers() async {
@@ -50,16 +49,15 @@ class _ManagePeoplePageState extends State<ManagePeoplePage> {
 
   @override
   Widget build(BuildContext context) {
+    // ignore: unused_local_variable
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: const [AppColors.primaryColor, AppColors.auxiliaryColor],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            stops: const [0.1, 0.6],
-          ),
-        ),
+        width: double.infinity,
+        height: screenHeight,
+        decoration: const BoxDecoration(color: AppColors.primaryColor),
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -70,6 +68,7 @@ class _ManagePeoplePageState extends State<ManagePeoplePage> {
                 ),
               ),
               const SizedBox(height: 20),
+
               isLoading
                   ? const CircularProgressIndicator()
                   : const UserTable(),
@@ -79,8 +78,8 @@ class _ManagePeoplePageState extends State<ManagePeoplePage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.auxiliaryColor,
                   padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
-                  foregroundColor: AppColors.primaryColor,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  foregroundColor: AppColors.secondaryColor,
                 ),
                 onPressed: () async {
                   final result = await Navigator.push(

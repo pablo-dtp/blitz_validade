@@ -102,15 +102,22 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double logoHeight = screenHeight * 0.2;  // A altura da logo será 20% da tela
+    double distanceFromLogo = logoHeight * 0.15; // Distância fixa do container de login para a logo
+
+    double logoTopPosition = screenHeight * 0.1; // Logo 10% abaixo do topo da tela
+    double loginContainerTopPosition = logoTopPosition + logoHeight + distanceFromLogo;
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          height: MediaQuery.of(context).size.height,
+          height: screenHeight,
           decoration: const BoxDecoration(color: AppColors.primaryColor),
           child: Stack(
             children: [
-              _buildLogo(),
-              _buildLoginContainer(),
+              _buildLogo(logoTopPosition),
+              _buildLoginContainer(loginContainerTopPosition),
             ],
           ),
         ),
@@ -118,28 +125,28 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildLogo() {
+  Widget _buildLogo(double topPosition) {
     return Positioned(
-      top: 40,
+      top: topPosition,
       left: 0,
       right: 0,
       child: Center(
         child: Image.asset(
           'assets/logo.png',
-          width: MediaQuery.of(context).size.width * 0.6,
-          height: MediaQuery.of(context).size.width * 0.6 * (380 / 380),
+          width: MediaQuery.of(context).size.width * 0.5,
+          height: MediaQuery.of(context).size.width * 0.5,
         ),
       ),
     );
   }
 
-  Widget _buildLoginContainer() {
+  Widget _buildLoginContainer(double topPosition) {
     return Positioned(
-      top: 420,
-      left: 20,
-      right: 20,
+      top: topPosition,
+      left: MediaQuery.of(context).size.width * 0.05,
+      right: MediaQuery.of(context).size.width * 0.05,
       child: Container(
-        height: 380,
+        height: MediaQuery.of(context).size.height * 0.5,  // Ajuste o tamanho do container conforme necessário
         decoration: BoxDecoration(
           color: AppColors.auxiliaryColor,
           borderRadius: BorderRadius.circular(15),
@@ -247,8 +254,6 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
-
 
   Widget _buildLoginButton() {
     return Padding(
