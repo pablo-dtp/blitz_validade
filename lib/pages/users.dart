@@ -1,42 +1,38 @@
-// ignore_for_file: file_names
-
-import 'addUsersPage.dart';
-import 'usersView.dart';
+import 'users_add.dart';
+import 'users_view.dart';
 import 'package:http/http.dart' as http;
-import 'imports.dart'; // Importando o arquivo que contém a tabela
+import 'imports.dart';
 
 class ManagePeoplePage extends StatefulWidget {
   const ManagePeoplePage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _ManagePeoplePageState createState() => _ManagePeoplePageState();
 }
 
 class _ManagePeoplePageState extends State<ManagePeoplePage> {
-  bool isLoading = false; // Indicador de carregamento
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _loadUsers(); // Carregar os usuários ao iniciar a página
+    _loadUsers();
   }
 
-  // Método para carregar os usuários
   Future<void> _loadUsers() async {
     setState(() {
-      isLoading = true; // Indicando que a atualização está em andamento
+      isLoading = true;
     });
 
     try {
       final response = await http.get(Uri.parse('${dotenv.env['API_BASE_URL']}/get_users'));
       if (response.statusCode == 200) {
         setState(() {
-          isLoading = false; // Atualização completada
+          isLoading = false;
         });
       } else {
         setState(() {
-          isLoading = false; // Atualização falhou
+          isLoading = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro ao carregar os usuários')),
@@ -64,7 +60,7 @@ class _ManagePeoplePageState extends State<ManagePeoplePage> {
             stops: const [0.1, 0.6],
           ),
         ),
-        child: SingleChildScrollView(  // Adicionando o SingleChildScrollView
+        child: SingleChildScrollView(
           child: Column(
             children: [
               AppBar(
@@ -74,10 +70,9 @@ class _ManagePeoplePageState extends State<ManagePeoplePage> {
                 ),
               ),
               const SizedBox(height: 20),
-              // Tabela de usuários ou indicador de carregamento
               isLoading
-                  ? const CircularProgressIndicator() // Mostrar o loading
-                  : const UserTable(), // Tabela de usuários
+                  ? const CircularProgressIndicator()
+                  : const UserTable(),
 
               const SizedBox(height: 20),
               ElevatedButton(
@@ -93,9 +88,8 @@ class _ManagePeoplePageState extends State<ManagePeoplePage> {
                     MaterialPageRoute(builder: (context) => const AddUserPage()),
                   );
 
-                  // Após retornar da tela de adicionar usuário, recarregar a lista
                   if (result == true) {
-                    _loadUsers(); // Recarregar a lista de usuários
+                    _loadUsers();
                   }
                 },
                 child: const Text("Adicionar Novo Usuário"),

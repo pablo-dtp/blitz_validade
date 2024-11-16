@@ -1,20 +1,17 @@
-// ignore_for_file: file_names
-
 import 'package:http/http.dart' as http;
-import 'imports.dart';  // Certifique-se de que está importando tudo que é necessário.
+import 'imports.dart';
 
 class AddProductPage extends StatefulWidget {
   const AddProductPage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _AddProductPageState createState() => _AddProductPageState();
 }
 
 class _AddProductPageState extends State<AddProductPage> {
   final TextEditingController _barcodeController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
-  final TextEditingController _packagingController = TextEditingController(text: '1');  // Valor padrão para embalagem
+  final TextEditingController _packagingController = TextEditingController(text: '1');
   final TextEditingController _expiryDateController = TextEditingController();
 
   String _productName = '';
@@ -27,9 +24,8 @@ class _AddProductPageState extends State<AddProductPage> {
   bool _isPackagingFilled = false;
   bool _isDateSelected = false;
 
-  // Função para consultar o produto no servidor
   Future<void> _fetchProductInfo(String barcode) async {
-    final url = '${dotenv.env['API_BASE_URL']}/get_product'; // Alterado para o IP correto (10.0.2.2)
+    final url = '${dotenv.env['API_BASE_URL']}/get_product';
     try {
       final response = await http.post(
         Uri.parse(url),
@@ -68,28 +64,26 @@ class _AddProductPageState extends State<AddProductPage> {
 
   Future<void> _selectExpiryDate(BuildContext context) async {
     final DateTime now = DateTime.now();
-    final DateTime minimumDate = now.add(Duration(days: 2)); // Data mínima (hoje + 2 dias)
+    final DateTime minimumDate = now.add(Duration(days: 3));
 
-    // Garantir que a data inicial seja no mínimo igual à data mínima
     final DateTime initialDate = now.isBefore(minimumDate) ? minimumDate : now;
 
     final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: initialDate,  // Usando a data corrigida
-      firstDate: minimumDate,  // Data mínima
+      initialDate: initialDate,
+      firstDate: minimumDate,
       lastDate: DateTime(2101),
     );
 
     if (pickedDate != null) {
       setState(() {
-        _expiryDate = "${pickedDate.toLocal()}".split(' ')[0];  // Formata a data para 'yyyy-mm-dd'
-        _expiryDateController.text = _expiryDate;  // Atualiza o campo de texto
+        _expiryDate = "${pickedDate.toLocal()}".split(' ')[0];
+        _expiryDateController.text = _expiryDate;
         _isDateSelected = true;
       });
     }
   }
 
-  // Função para verificar se todos os campos estão preenchidos
   void _checkFields() {
     setState(() {
       _isQuantityFilled = _quantityController.text.isNotEmpty;
@@ -101,11 +95,11 @@ class _AddProductPageState extends State<AddProductPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,  // Cor da AppBar
+        backgroundColor: AppColors.primaryColor,
         title: Center(
           child: Image.asset(
-            'assets/logo.png', // Caminho da logo
-            width: 80, // Tamanho da logo
+            'assets/logo.png',
+            width: 80,
             height: 80,
           ),
         ),
@@ -122,17 +116,16 @@ class _AddProductPageState extends State<AddProductPage> {
         child: Center(
           child: Column(
             children: [
-              // Container superior com campo de texto e ícone de código de barras
               Padding(
-                padding: const EdgeInsets.only(top: 40),  // Define o espaçamento do topo
+                padding: const EdgeInsets.only(top: 40),
                 child: Align(
-                  alignment: Alignment.topCenter,  // Alinha o container ao topo
+                  alignment: Alignment.topCenter,
                   child: Container(
-                    width: MediaQuery.of(context).size.width * 0.9, // 80% da largura da tela
-                    height: MediaQuery.of(context).size.height * 0.09, // 18% da altura
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    height: MediaQuery.of(context).size.height * 0.09,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(13), // Bordas arredondadas
+                      borderRadius: BorderRadius.circular(13),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black26,
@@ -141,13 +134,12 @@ class _AddProductPageState extends State<AddProductPage> {
                         ),
                       ],
                     ),
-                    padding: const EdgeInsets.all(16),  // Adicionando padding para conteúdo interno
+                    padding: const EdgeInsets.all(16),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,  // Para alinhar o campo e ícone
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Campo de texto para digitar o código de barras manualmente
                         SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.7, // Menor largura para caber na linha
+                          width: MediaQuery.of(context).size.width * 0.7,
                           child: TextField(
                             controller: _barcodeController,
                             decoration: InputDecoration(
@@ -158,17 +150,16 @@ class _AddProductPageState extends State<AddProductPage> {
                               ),
                               contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                             ),
-                            keyboardType: TextInputType.number, // Permite apenas números
-                            inputFormatters: [FilteringTextInputFormatter.digitsOnly], // Apenas números (0-9)
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           ),
                         ),
-                        // Ícone de código de barras ao lado do campo de texto
                         IconButton(
-                          icon: Icon(Icons.barcode_reader, size: 25, color: Colors.black), // Ícone de código de barras
+                          icon: Icon(Icons.barcode_reader, size: 25, color: Colors.black),
                           onPressed: () {
                             final barcode = _barcodeController.text;
                             if (barcode.isNotEmpty) {
-                              _fetchProductInfo(barcode);  // Chama a função para buscar o produto
+                              _fetchProductInfo(barcode);
                             }
                           },
                         ),
@@ -177,13 +168,12 @@ class _AddProductPageState extends State<AddProductPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 40),  // Espaço entre os containers
-              // Container inferior com informações do produto e campos
+              SizedBox(height: 40),
               Container(
-                width: MediaQuery.of(context).size.width * 0.9, // 80% da largura da tela
+                width: MediaQuery.of(context).size.width * 0.9,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(16), // Bordas arredondadas
+                  borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black26,
@@ -192,7 +182,7 @@ class _AddProductPageState extends State<AddProductPage> {
                     ),
                   ],
                 ),
-                padding: const EdgeInsets.all(16),  // Adicionando padding para conteúdo interno
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -200,34 +190,30 @@ class _AddProductPageState extends State<AddProductPage> {
                     _buildField('Descrição', _productDescription),
                     _buildField('Código de Barras', _productBarcode),
                     _buildQuantityAndPackagingField(),
-                    _buildDateField(),  // Data de validade vem por último agora
-                    SizedBox(height: 20),  // Espaço antes do botão
+                    _buildDateField(),
+                    SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: (_isProductFound && _isQuantityFilled && _isPackagingFilled && _isDateSelected) 
                           ? () async {
-                              // Preparando os dados para o envio
                               final Map<String, dynamic> productData = {
-                                'produto': int.tryParse(_productName) ?? 0,  // Converte nome_produto para int (se possível), caso contrário usa 0
-                                'descricao': _productDescription,  // String (não precisa de conversão)
-                                'codigo_barras': _productBarcode,  // String (não precisa de conversão)
-                                'quantidade': int.tryParse(_quantityController.text) ?? 0,  // Converte quantidade para int (se possível), caso contrário usa 0
-                                'embalagem': int.tryParse(_packagingController.text) ?? 1,  // Converte embalagem para int (se possível), caso contrário usa 1
-                                'data_validade': _expiryDate,  // String (não precisa de conversão)
+                                'produto': int.tryParse(_productName) ?? 0,
+                                'descricao': _productDescription,
+                                'codigo_barras': _productBarcode,
+                                'quantidade': int.tryParse(_quantityController.text) ?? 1,
+                                'embalagem': int.tryParse(_packagingController.text) ?? 1,
+                                'data_validade': _expiryDate,
                               };
 
-                              // Enviar os dados ao servidor
                               final response = await http.post(
-                                Uri.parse('${dotenv.env['API_BASE_URL']}/add_validade'),  // URL do servidor
+                                Uri.parse('${dotenv.env['API_BASE_URL']}/add_validade'),
                                 headers: {'Content-Type': 'application/json'},
                                 body: json.encode(productData),
                               );
 
                               if (response.statusCode == 200) {
-                                // Caso o registro tenha sido bem-sucedido
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(content: Text('Produto registrado com sucesso!')),
                                 );
-                                // Limpar os campos após o registro
                                 setState(() {
                                   _barcodeController.clear();
                                   _quantityController.clear();
@@ -243,7 +229,6 @@ class _AddProductPageState extends State<AddProductPage> {
                                   _isDateSelected = false;
                                 });
                               } else {
-                                // Caso o registro falhe
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(content: Text('Erro ao registrar produto.')),
                                 );
@@ -281,7 +266,7 @@ class _AddProductPageState extends State<AddProductPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('$label: $value', style: TextStyle(fontSize: 16)),
-          Divider(color: const Color.fromARGB(255, 127, 121, 121)),  // Linha divisória
+          Divider(color: const Color.fromARGB(255, 127, 121, 121)),
         ],
       ),
     );
@@ -289,14 +274,13 @@ class _AddProductPageState extends State<AddProductPage> {
 
   Widget _buildQuantityAndPackagingField() {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),  // Espaçamento entre os campos
+      margin: const EdgeInsets.only(bottom: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Quantidades e Embalagens:', style: TextStyle(fontSize: 16)),
           Row(
             children: [
-              // Quantidade
               Expanded(
                 child: TextField(
                   controller: _quantityController,
@@ -305,12 +289,11 @@ class _AddProductPageState extends State<AddProductPage> {
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly], // Somente números
-                  onChanged: (text) => _checkFields(),  // Verifica se a quantidade foi preenchida
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  onChanged: (text) => _checkFields(),
                 ),
               ),
               SizedBox(width: 10),
-              // Embalagem
               Expanded(
                 child: TextField(
                   controller: _packagingController,
@@ -319,8 +302,8 @@ class _AddProductPageState extends State<AddProductPage> {
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly], // Somente números
-                  onChanged: (text) => _checkFields(),  // Verifica se a embalagem foi preenchida
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  onChanged: (text) => _checkFields(),
                 ),
               ),
             ],
@@ -332,7 +315,7 @@ class _AddProductPageState extends State<AddProductPage> {
 
   Widget _buildDateField() {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),  // Espaçamento entre os campos
+      margin: const EdgeInsets.only(bottom: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

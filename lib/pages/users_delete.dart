@@ -1,11 +1,9 @@
-// ignore_for_file: file_names
-
 import 'package:http/http.dart' as http;
 import 'imports.dart';
 
 class DeleteUser extends StatelessWidget {
   final int userId;
-  final Function refreshUsers;  // Função para recarregar os usuários
+  final Function refreshUsers;
 
   const DeleteUser({super.key, required this.userId, required this.refreshUsers});
 
@@ -14,13 +12,10 @@ class DeleteUser extends StatelessWidget {
     final response = await http.delete(url);
 
     if (response.statusCode == 200) {
-      // Exibe um Snackbar de sucesso
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Usuário deletado com sucesso')));
 
-      // Chama a função de recarregar os usuários
-      refreshUsers();  // Recarrega a lista de usuários após a exclusão
+      refreshUsers();
     } else {
-      // Exibe um Snackbar de erro
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao deletar usuário')));
     }
   }

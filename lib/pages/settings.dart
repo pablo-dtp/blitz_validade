@@ -26,7 +26,7 @@ class SettingsPage extends StatelessWidget {
               child: Image.asset('assets/logo.png', width: 80, height: 80),
             ),
           ),
-          Expanded(child: Container()), // Expande para ocupar espaço e empurrar o botão para baixo
+          Expanded(child: Container()),
           _buildLogoutButton(context),
         ],
       ),
@@ -38,7 +38,6 @@ class SettingsPage extends StatelessWidget {
       padding: const EdgeInsets.all(20.0),
       child: ElevatedButton.icon(
         onPressed: () async {
-          // Não remover as credenciais ao sair
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const LoginPage()),

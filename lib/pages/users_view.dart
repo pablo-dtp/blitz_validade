@@ -5,14 +5,12 @@ class UserTable extends StatefulWidget {
   const UserTable({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _UserTableState createState() => _UserTableState();
 
-  // Método público para atualizar os dados da tabela
   void refreshTable(BuildContext context) {
     _UserTableState? state = context.findAncestorStateOfType<_UserTableState>();
     if (state != null) {
-      state._fetchUsers(); // Chama a função de atualizar dados
+      state._fetchUsers();
     }
   }
 }
@@ -21,7 +19,7 @@ class _UserTableState extends State<UserTable> {
   List<Map<String, dynamic>> users = [];
   bool isNameAscending = true;
   bool isPermissionAscending = true;
-  String? selectedFilter = "name"; // Começa como filtro por nome (A-Z).
+  String? selectedFilter = "name";
 
   @override
   void initState() {
@@ -37,7 +35,6 @@ class _UserTableState extends State<UserTable> {
         final responseBody = json.decode(response.body);
         setState(() {
           users = List<Map<String, dynamic>>.from(responseBody['users']);
-          // Mantém a ordenação atual
           if (selectedFilter == "name") {
             users.sort((a, b) => isNameAscending
                 ? a['name'].compareTo(b['name'])
@@ -74,7 +71,7 @@ class _UserTableState extends State<UserTable> {
   }
 
   String limitNameToTwoWords(String fullName) {
-    List<String> prepositions = ['da', 'de', 'do', 'das', 'dos', 'e']; // Lista de preposições comuns
+    List<String> prepositions = ['da', 'de', 'do', 'das', 'dos', 'e'];
     List<String> nameParts = fullName.split(' ');
 
     String firstName = '';
@@ -113,7 +110,6 @@ class _UserTableState extends State<UserTable> {
     });
   }
 
-  // Função para atualizar o usuário
   Future<void> _updateUser(int userId, String name, int permissionLevel) async {
     try {
       final response = await http.put(
@@ -129,7 +125,7 @@ class _UserTableState extends State<UserTable> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Usuário atualizado com sucesso!')),
         );
-        _fetchUsers(); // Atualiza a tabela
+        _fetchUsers();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro ao atualizar o usuário')),
@@ -142,7 +138,6 @@ class _UserTableState extends State<UserTable> {
     }
   }
 
-  // Função para deletar o usuário
   Future<void> _deleteUser(int userId) async {
     try {
       final response = await http.delete(
@@ -153,7 +148,7 @@ class _UserTableState extends State<UserTable> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Usuário deletado com sucesso!')),
         );
-        _fetchUsers(); // Atualiza a tabela
+        _fetchUsers();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro ao deletar o usuário')),
@@ -187,7 +182,6 @@ class _UserTableState extends State<UserTable> {
         ],
       ),
       child: SizedBox(
-        // Limita a altura da tabela a 60% da altura da tela
         height: MediaQuery.of(context).size.height * 0.6,
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
@@ -283,7 +277,6 @@ class _UserTableState extends State<UserTable> {
                                               style: TextStyle(color: Colors.black),
                                             ),
                                             onTap: () {
-                                              // Ação de editar usuário
                                               _showEditDialog(user);
                                             },
                                           ),
@@ -294,7 +287,6 @@ class _UserTableState extends State<UserTable> {
                                               style: TextStyle(color: Colors.black),
                                             ),
                                             onTap: () {
-                                              // Ação de deletar usuário
                                               _deleteUser(user['id']);
                                             },
                                           ),
@@ -316,7 +308,6 @@ class _UserTableState extends State<UserTable> {
     );
   }
 
-  // Função para mostrar o modal de edição
   void _showEditDialog(Map<String, dynamic> user) {
     TextEditingController nameController = TextEditingController(text: user['name']);
     int permissionLevel = user['permission_level'];

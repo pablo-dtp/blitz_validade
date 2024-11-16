@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 import 'imports.dart';
 import 'package:http/http.dart' as http;
 
@@ -7,7 +5,6 @@ class AddUserPage extends StatefulWidget {
   const AddUserPage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _AddUserPageState createState() => _AddUserPageState();
 }
 
@@ -29,7 +26,6 @@ class _AddUserPageState extends State<AddUserPage> {
 
   void _checkForm() {
     setState(() {
-      // O botão será habilitado quando todos os campos estiverem preenchidos e o permission_level estiver selecionado
       isButtonEnabled = usernameController.text.isNotEmpty &&
           passwordController.text.isNotEmpty &&
           nameController.text.isNotEmpty &&
@@ -37,30 +33,26 @@ class _AddUserPageState extends State<AddUserPage> {
     });
   }
 
-  // Função para formatar o nome (primeira letra de cada palavra em maiúscula, exceto preposições)
   String formatName(String name) {
     List<String> prepositions = ['de', 'da', 'do', 'das', 'dos', 'e', 'a', 'o', 'as', 'os', 'para', 'com'];
     return name
-        .split(' ') // Divide o nome em palavras
+        .split(' ')
         .map((word) {
           if (prepositions.contains(word.toLowerCase())) {
-            return word.toLowerCase(); // Mantém as preposições em minúsculas
+            return word.toLowerCase();
           } else {
             return word.isNotEmpty
-                ? word[0].toUpperCase() + word.substring(1).toLowerCase() // Primeira letra em maiúscula e o restante em minúscula
-                : ''; // Caso a palavra esteja vazia
+                ? word[0].toUpperCase() + word.substring(1).toLowerCase()
+                : '';
           }
-        }).join(' '); // Junta as palavras de volta com espaço
+        }).join(' ');
   }
 
-  // Função para enviar o novo usuário para o servidor
   Future<void> _addUser() async {
     final response = await http.post(
       Uri.parse('${dotenv.env['API_BASE_URL']}/add_user'),
       headers: {
         'Content-Type': 'application/json',
-        'Username': 'admin_role',  // Substitua com o username correto
-        'Password': 'root',  // Substitua com a senha correta
       },
       body: json.encode({
         'username': usernameController.text.toLowerCase(),
@@ -74,12 +66,10 @@ class _AddUserPageState extends State<AddUserPage> {
       final responseBody = json.decode(response.body);
       final int newUserId = responseBody['user_id'];
 
-      // Exibe um snackbar de sucesso
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Usuário adicionado com sucesso! ID: $newUserId')),
       );
 
-      // Limpa os campos
       usernameController.clear();
       passwordController.clear();
       nameController.clear();
@@ -87,8 +77,7 @@ class _AddUserPageState extends State<AddUserPage> {
         selectedPermissionLevel = null;
       });
 
-      // Retorna à página anterior e sinaliza que a lista precisa ser atualizada
-      Navigator.pop(context, true);  // Envia 'true' para a página anterior para atualizar a lista
+      Navigator.pop(context, true);
     } else {
       final responseBody = json.decode(response.body);
       final String errorMessage = responseBody['message'];
@@ -104,10 +93,10 @@ class _AddUserPageState extends State<AddUserPage> {
       body: SingleChildScrollView(
         child: Container(
           height: MediaQuery.of(context).size.height,
-          decoration: BoxDecoration(color: AppColors.primaryColor), // Alterando fundo para a cor primária
+          decoration: BoxDecoration(color: AppColors.primaryColor),
           child: Stack(
             children: [
-              _buildBackButton(), // Botão de voltar adicionado aqui
+              _buildBackButton(),
               _buildLogo(),
               _buildAddUserForm(),
             ],
@@ -117,20 +106,19 @@ class _AddUserPageState extends State<AddUserPage> {
     );
   }
 
-  // Função para construir o botão de voltar
   Widget _buildBackButton() {
     return Positioned(
-      top: 40, // Ajuste a posição do botão de volta
-      left: 20, // Colocando o botão do lado esquerdo
+      top: 40,
+      left: 20,
       child: GestureDetector(
         onTap: () {
-          Navigator.pop(context); // Retorna para a página anterior
+          Navigator.pop(context);
         },
         child: Container(
-          padding: const EdgeInsets.all(8.0), // Tamanho do círculo
+          padding: const EdgeInsets.all(8.0),
           decoration: BoxDecoration(
-            color: Colors.white, // Cor de fundo do círculo
-            shape: BoxShape.circle, // Forma circular
+            color: Colors.white,
+            shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
                 color: Colors.black26,
@@ -140,19 +128,18 @@ class _AddUserPageState extends State<AddUserPage> {
             ],
           ),
           child: Icon(
-            Icons.arrow_back, // Ícone da seta para a esquerda
-            color: AppColors.primaryColor, // Cor da seta (usando a cor do fundo)
-            size: 24, // Tamanho do ícone
+            Icons.arrow_back,
+            color: AppColors.primaryColor,
+            size: 24,
           ),
         ),
       ),
     );
   }
 
-  // Função para construir a logo
   Widget _buildLogo() {
     return Positioned(
-      top: 100, // Ajusta a posição da logo para que o botão de voltar não a cubra
+      top: 100,
       left: 0,
       right: 0,
       child: Center(
@@ -165,10 +152,9 @@ class _AddUserPageState extends State<AddUserPage> {
     );
   }
 
-  // Função para construir o formulário de adição de usuário
   Widget _buildAddUserForm() {
     return Positioned(
-      bottom: 20, // Coloca o formulário na parte inferior
+      bottom: 20,
       left: 20,
       right: 20,
       child: Container(
@@ -193,7 +179,7 @@ class _AddUserPageState extends State<AddUserPage> {
             const SizedBox(height: 20),
             _buildTextField(nameController, 'Nome completo'),
             const SizedBox(height: 20),
-            _buildPermissionLevelDropdown(),  // Adicionando o Dropdown para o permission_level
+            _buildPermissionLevelDropdown(),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: isButtonEnabled ? _addUser : null,
@@ -205,7 +191,6 @@ class _AddUserPageState extends State<AddUserPage> {
     );
   }
 
-  // Função para construir um campo de texto
   Widget _buildTextField(TextEditingController controller, String label, {bool obscureText = false, bool isUserField = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -217,15 +202,14 @@ class _AddUserPageState extends State<AddUserPage> {
           border: const OutlineInputBorder(),
         ),
         inputFormatters: isUserField 
-            ? [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]'))] // Permite apenas letras, números e underscore para o usuário
+            ? [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]'))]
             : label == 'Senha'
-                ? [] // Sem restrição para a senha
-                : [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z ]'))], // Permite apenas letras e espaços para o nome
+                ? []
+                : [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z ]'))],
       ),
     );
   }
 
-  // Função para construir o dropdown de seleção do permission level
   Widget _buildPermissionLevelDropdown() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -238,7 +222,7 @@ class _AddUserPageState extends State<AddUserPage> {
         onChanged: (int? newValue) {
           setState(() {
             selectedPermissionLevel = newValue;
-            _checkForm(); // Garantir que a verificação seja feita ao alterar o nível de permissão
+            _checkForm();
           });
         },
         items: const [

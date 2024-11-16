@@ -5,7 +5,6 @@ class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _HomePageState createState() => _HomePageState();
 }
 
@@ -20,19 +19,14 @@ class _HomePageState extends State<HomePage> {
 
   void _onItemTapped(int index) async {
     if (index == 2) {
-      // Verifica permissão antes de acessar a ManagePeoplePage
       SharedPreferences prefs = await SharedPreferences.getInstance();
       int permissionLevel = prefs.getInt('permission_level') ?? 0;
-      // Exibe o permission_level no console para debug
-      print('Permission Level: $permissionLevel');
       if (permissionLevel < 3) {
-        // Exibe alerta se o usuário não tiver permissão
         _showPermissionAlert();
         return;
       }
     }
 
-    // Permite mudar a página normalmente
     setState(() {
       _currentIndex = index;
     });
@@ -49,7 +43,7 @@ class _HomePageState extends State<HomePage> {
             TextButton(
               child: const Text("OK"),
               onPressed: () {
-                Navigator.of(context).pop(); // Fecha o alerta
+                Navigator.of(context).pop();
               },
             ),
           ],

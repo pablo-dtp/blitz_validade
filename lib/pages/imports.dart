@@ -1,11 +1,10 @@
-// Exporta todas as páginas que você vai usar
 export 'package:flutter_dotenv/flutter_dotenv.dart';
 export 'package:flutter/material.dart';
 export 'home.dart';
 export 'login.dart';
-export 'addProduct.dart';
-export 'manageProducts.dart';
-export 'managePeople.dart';
+export 'products_add.dart';
+export 'products.dart';
+export 'users.dart';
 export 'settings.dart';
 export '../style/colors.dart';
 export 'dart:convert';

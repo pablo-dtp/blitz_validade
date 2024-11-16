@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 import 'imports.dart';
 import 'package:http/http.dart' as http;
 
@@ -24,7 +22,7 @@ class UpdateUser extends StatefulWidget {
 class _UpdateUserState extends State<UpdateUser> {
   late TextEditingController _nameController;
   int _selectedPermissionLevel = 1;
-  bool _isLoading = false; // Indicador de carregamento
+  bool _isLoading = false;
   String? _errorMessage;
 
   @override
@@ -62,12 +60,11 @@ class _UpdateUserState extends State<UpdateUser> {
     });
 
     if (response.statusCode == 200) {
-      // Mostra mensagem de sucesso e atualiza a lista de usuários
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Usuário atualizado com sucesso')),
       );
       widget.refreshUsers();
-      Navigator.pop(context); // Fecha o diálogo somente após sucesso
+      Navigator.pop(context);
     } else {
       setState(() {
         _errorMessage = 'Erro ao atualizar usuário: ${response.body}';
@@ -121,7 +118,7 @@ class _UpdateUserState extends State<UpdateUser> {
           child: const Text('Cancelar'),
         ),
         ElevatedButton(
-          onPressed: _isLoading ? null : _updateUser, // Desabilita botão durante carregamento
+          onPressed: _isLoading ? null : _updateUser,
           child: _isLoading
               ? const SizedBox(
                   height: 20,

@@ -53,28 +53,24 @@ class _LoginPageState extends State<LoginPage> {
         final responseBody = json.decode(response.body);
         final permissionLevel = responseBody['permission_level'];
 
-        // Armazenar dados com SharedPreferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setInt('permission_level', permissionLevel);
 
-        // Armazenar as credenciais e o estado do "Continuar Conectado"
         if (rememberMe) {
           prefs.setString('username', usernameController.text);
           prefs.setString('password', passwordController.text);
-          prefs.setBool('remember_me', rememberMe);  // Salvar o estado do checkbox
+          prefs.setBool('remember_me', rememberMe);
         } else {
           prefs.remove('username');
           prefs.remove('password');
         }
 
-        // Navegar para a HomePage
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomePage()),
         );
       }
     } else {
-      // Se o login falhar, apaga as credenciais salvas
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.remove('username');
       prefs.remove('password');
@@ -88,7 +84,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // Verificar se há credenciais e o estado do "Continuar conectado" salvos
   Future<void> _checkSavedCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? savedUsername = prefs.getString('username');
@@ -96,13 +91,11 @@ class _LoginPageState extends State<LoginPage> {
     bool? savedRememberMe = prefs.getBool('remember_me');
 
     if (savedUsername != null && savedPassword != null) {
-      // Preencher os campos com as credenciais salvas
       usernameController.text = savedUsername;
       passwordController.text = savedPassword;
 
-      // Restaurar o estado do "Continuar conectado"
       setState(() {
-        rememberMe = savedRememberMe ?? false;  // Caso não exista, assume como false
+        rememberMe = savedRememberMe ?? false;
       });
     }
   }
@@ -193,7 +186,7 @@ class _LoginPageState extends State<LoginPage> {
           labelStyle: TextStyle(color: AppColors.secondaryColor),
         ),
         inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')), // Permite apenas letras
+          FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')),
         ],
       ),
     );
@@ -226,7 +219,7 @@ class _LoginPageState extends State<LoginPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center, // Garante alinhamento central
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Checkbox(
             value: rememberMe,
@@ -235,12 +228,10 @@ class _LoginPageState extends State<LoginPage> {
                 rememberMe = value!;
               });
 
-              // Armazenar o estado do "Continuar conectado"
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.setBool('remember_me', rememberMe);
 
               if (!rememberMe) {
-                // Remover credenciais se a opção for desmarcada
                 prefs.remove('username');
                 prefs.remove('password');
               }
@@ -248,10 +239,9 @@ class _LoginPageState extends State<LoginPage> {
             checkColor: AppColors.auxiliaryColor,
             activeColor: AppColors.effectColor,
           ),
-          SizedBox(width: 0), // Ajusta o espaçamento entre o checkbox e o texto
+          SizedBox(width: 0),
           const Text(
             'Continuar conectado',
-            //style: TextStyle(fontSize: 16), // Ajusta o tamanho da fonte, se necessário
           ),
         ],
       ),
@@ -264,7 +254,7 @@ class _LoginPageState extends State<LoginPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: SizedBox(
-        width: double.infinity, // Ocupa toda a largura disponível
+        width: double.infinity,
         child: ElevatedButton.icon(
           onPressed: isButtonEnabled ? _login : null,
           icon: const Icon(Icons.login, color: AppColors.auxiliaryColor),
@@ -272,7 +262,7 @@ class _LoginPageState extends State<LoginPage> {
             'Entrar',
             style: TextStyle(
               color: AppColors.auxiliaryColor,
-              overflow: TextOverflow.ellipsis, // Previne que o texto quebre
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           style: ElevatedButton.styleFrom(
