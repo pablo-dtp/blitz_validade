@@ -1,12 +1,13 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: file_names
+
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'imports.dart';  // Certifique-se de que está importando tudo que é necessário.
 
 class AddProductPage extends StatefulWidget {
   const AddProductPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _AddProductPageState createState() => _AddProductPageState();
 }
 
@@ -28,7 +29,7 @@ class _AddProductPageState extends State<AddProductPage> {
 
   // Função para consultar o produto no servidor
   Future<void> _fetchProductInfo(String barcode) async {
-    final url = 'http://192.168.1.2:5000/get_product'; // Alterado para o IP correto (10.0.2.2)
+    final url = '${dotenv.env['API_BASE_URL']}/get_product'; // Alterado para o IP correto (10.0.2.2)
     try {
       final response = await http.post(
         Uri.parse(url),
@@ -216,7 +217,7 @@ class _AddProductPageState extends State<AddProductPage> {
 
                               // Enviar os dados ao servidor
                               final response = await http.post(
-                                Uri.parse('http://192.168.1.2:5000/add_validade'),  // URL do servidor
+                                Uri.parse('${dotenv.env['API_BASE_URL']}/add_validade'),  // URL do servidor
                                 headers: {'Content-Type': 'application/json'},
                                 body: json.encode(productData),
                               );

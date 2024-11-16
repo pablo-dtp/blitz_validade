@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: file_names
+
 import 'package:http/http.dart' as http;
+import 'imports.dart';
 
 class DeleteUser extends StatelessWidget {
   final int userId;
@@ -8,7 +10,7 @@ class DeleteUser extends StatelessWidget {
   const DeleteUser({super.key, required this.userId, required this.refreshUsers});
 
   Future<void> _deleteUser(BuildContext context) async {
-    final url = Uri.parse('http://192.168.1.2:5000/delete_user/$userId');
+    final url = Uri.parse('${dotenv.env['API_BASE_URL']}/delete_user/$userId');
     final response = await http.delete(url);
 
     if (response.statusCode == 200) {

@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'addUsersPage.dart';
 import 'usersView.dart';
 import 'package:http/http.dart' as http;
@@ -27,7 +29,7 @@ class _ManagePeoplePageState extends State<ManagePeoplePage> {
     });
 
     try {
-      final response = await http.get(Uri.parse('http://192.168.1.2:5000/get_users'));
+      final response = await http.get(Uri.parse('${dotenv.env['API_BASE_URL']}/get_users'));
       if (response.statusCode == 200) {
         setState(() {
           isLoading = false; // Atualização completada

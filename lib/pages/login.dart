@@ -1,6 +1,5 @@
 import 'imports.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
@@ -41,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _login() async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.2:5000/login'),
+      Uri.parse('${dotenv.env['API_BASE_URL']}/login'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
         'username': usernameController.text.toLowerCase(),

@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: file_names
+
+import 'imports.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class UpdateUser extends StatefulWidget {
   final int userId;
@@ -46,7 +47,7 @@ class _UpdateUserState extends State<UpdateUser> {
       _errorMessage = null;
     });
 
-    final url = Uri.parse('http://192.168.1.2:5000/update_user/${widget.userId}');
+    final url = Uri.parse('${dotenv.env['API_BASE_URL']}/update_user/${widget.userId}');
     final response = await http.put(
       url,
       headers: {'Content-Type': 'application/json'},

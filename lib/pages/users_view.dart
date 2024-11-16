@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
+import 'imports.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class UserTable extends StatefulWidget {
   const UserTable({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _UserTableState createState() => _UserTableState();
 
   // Método público para atualizar os dados da tabela
@@ -31,7 +31,7 @@ class _UserTableState extends State<UserTable> {
 
   Future<void> _fetchUsers() async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.1.2:5000/get_users'));
+      final response = await http.get(Uri.parse('${dotenv.env['API_BASE_URL']}/get_users'));
 
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);
@@ -117,7 +117,7 @@ class _UserTableState extends State<UserTable> {
   Future<void> _updateUser(int userId, String name, int permissionLevel) async {
     try {
       final response = await http.put(
-        Uri.parse('http://192.168.1.2:5000/update_user/$userId'),
+        Uri.parse('${dotenv.env['API_BASE_URL']}/update_user/$userId'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'name': name,
@@ -146,7 +146,7 @@ class _UserTableState extends State<UserTable> {
   Future<void> _deleteUser(int userId) async {
     try {
       final response = await http.delete(
-        Uri.parse('http://192.168.1.2:5000/delete_user/$userId'),
+        Uri.parse('${dotenv.env['API_BASE_URL']}/delete_user/$userId'),
       );
 
       if (response.statusCode == 200) {

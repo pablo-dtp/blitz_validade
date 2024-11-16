@@ -1,6 +1,7 @@
+// ignore_for_file: file_names
+
 import 'imports.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class AddUserPage extends StatefulWidget {
   const AddUserPage({super.key});
@@ -55,7 +56,7 @@ class _AddUserPageState extends State<AddUserPage> {
   // Função para enviar o novo usuário para o servidor
   Future<void> _addUser() async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.2:5000/add_user'),
+      Uri.parse('${dotenv.env['API_BASE_URL']}/add_user'),
       headers: {
         'Content-Type': 'application/json',
         'Username': 'admin_role',  // Substitua com o username correto
