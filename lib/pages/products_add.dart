@@ -11,7 +11,7 @@ class AddProductPage extends StatefulWidget {
 class _AddProductPageState extends State<AddProductPage> {
   final TextEditingController _barcodeController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
-  final TextEditingController _packagingController = TextEditingController(text: '1');
+  final TextEditingController _packagingController = TextEditingController();
   final TextEditingController _expiryDateController = TextEditingController();
   
   late double firstContainerTopPosition;
@@ -25,7 +25,6 @@ class _AddProductPageState extends State<AddProductPage> {
 
   bool _isProductFound = false;
   bool _isQuantityFilled = false;
-  bool _isPackagingFilled = false;
   bool _isDateSelected = false;
 
   Future<void> _fetchProductInfo(String barcode) async {
@@ -87,7 +86,6 @@ class _AddProductPageState extends State<AddProductPage> {
   void _checkFields() {
     setState(() {
       _isQuantityFilled = _quantityController.text.isNotEmpty;
-      _isPackagingFilled = _packagingController.text.isNotEmpty;
     });
   }
 
@@ -97,10 +95,8 @@ class _AddProductPageState extends State<AddProductPage> {
     final screenHeight = MediaQuery.of(context).size.height;
     final appBarHeight = AppBar().preferredSize.height;
 
-    // Agora calculamos a posição do primeiro container a 5% abaixo da AppBar
-    firstContainerTopPosition = appBarHeight + (screenHeight * 0.02); // 5% abaixo da AppBar
-
-    firstContainerLeftPosition = screenWidth * 0.05; // 5% da largura da tela
+    firstContainerTopPosition = appBarHeight + (screenHeight * 0.02);
+    firstContainerLeftPosition = screenWidth * 0.05;
     firstContainerRightPosition = screenWidth * 0.05;
 
     return Scaffold(
@@ -115,23 +111,22 @@ class _AddProductPageState extends State<AddProductPage> {
         ),
       ),
       body: Container(
-        width: double.infinity, // Garante que o container ocupe toda a largura
-        height: screenHeight, // Garante que o container ocupe toda a altura da tela
+        width: double.infinity,
+        height: screenHeight,
         decoration: const BoxDecoration(
-          color: AppColors.primaryColor, // Cor de fundo
+          color: AppColors.primaryColor,
         ),
         child: Stack(
           children: [
-            // Container do código de barras
             Positioned(
-              top: firstContainerTopPosition, // Agora a posição é 5% abaixo da AppBar
+              top: firstContainerTopPosition,
               left: firstContainerLeftPosition,
               right: firstContainerRightPosition,
               child: Container(
                 height: 60,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(13),
+                  borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black26,
@@ -140,7 +135,7 @@ class _AddProductPageState extends State<AddProductPage> {
                     ),
                   ],
                 ),
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(8),
                 child: Row(
                   children: [
                     Expanded(
@@ -169,9 +164,8 @@ class _AddProductPageState extends State<AddProductPage> {
               ),
             ),
             
-            // Container das informações do produto
             Positioned(
-              top: firstContainerTopPosition + 100, // 70 pixels abaixo do primeiro container
+              top: firstContainerTopPosition + 100,
               left: firstContainerLeftPosition,
               right: firstContainerRightPosition,
               child: Container(
@@ -197,13 +191,13 @@ class _AddProductPageState extends State<AddProductPage> {
                     _buildDateField(),
                     SizedBox(height: 20),
                     ElevatedButton(
-                      onPressed: (_isProductFound && _isQuantityFilled && _isPackagingFilled && _isDateSelected)
+                      onPressed: (_isProductFound && _isQuantityFilled && _isDateSelected)
                           ? () async {
                               final Map<String, dynamic> productData = {
                                 'produto': int.tryParse(_productName) ?? 0,
                                 'descricao': _productDescription,
                                 'codigo_barras': _productBarcode,
-                                'quantidade': int.tryParse(_quantityController.text) ?? 1,
+                                'quantidade': int.tryParse(_quantityController.text) ?? 0,
                                 'embalagem': int.tryParse(_packagingController.text) ?? 1,
                                 'data_validade': _expiryDate,
                               };
@@ -229,7 +223,6 @@ class _AddProductPageState extends State<AddProductPage> {
                                   _expiryDate = '';
                                   _isProductFound = false;
                                   _isQuantityFilled = false;
-                                  _isPackagingFilled = false;
                                   _isDateSelected = false;
                                 });
                               } else {
@@ -241,7 +234,7 @@ class _AddProductPageState extends State<AddProductPage> {
                           : null,
                       style: ElevatedButton.styleFrom(
                         minimumSize: Size(double.infinity, 50),
-                        backgroundColor: (_isProductFound && _isQuantityFilled && _isPackagingFilled && _isDateSelected)
+                        backgroundColor: (_isProductFound && _isQuantityFilled && _isDateSelected)
                             ? Colors.blue
                             : Colors.grey,
                         textStyle: TextStyle(fontSize: 18),
@@ -302,7 +295,7 @@ class _AddProductPageState extends State<AddProductPage> {
                 child: TextField(
                   controller: _packagingController,
                   decoration: InputDecoration(
-                    hintText: 'Embalagem',
+                    hintText: '1 - Unidade',
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.number,

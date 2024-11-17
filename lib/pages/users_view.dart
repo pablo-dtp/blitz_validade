@@ -166,147 +166,144 @@ class _UserTableState extends State<UserTable> {
     return _buildUserTable();
   }
 
-  Widget _buildUserTable() {
-    return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10.0,
-            offset: Offset(0, 5),
-          ),
-        ],
-      ),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.6,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              columnSpacing: 30,
-              columns: [
-                DataColumn(
-                  label: GestureDetector(
-                    onTap: () {
-                      _toggleSortOrder("name");
-                    },
-                    child: Row(
-                      children: [
-                        Text(
-                          'Nome Completo',
-                          style: const TextStyle(color: Colors.black),
-                        ),
-                        if (selectedFilter == "name") ...[
-                          Icon(
-                            isNameAscending ? Icons.arrow_upward : Icons.arrow_downward,
-                            size: 16,
-                            color: Colors.black,
-                          ),
-                        ],
-                      ],
+Widget _buildUserTable() {
+  return Container(
+    margin: const EdgeInsets.all(20),
+    padding: const EdgeInsets.all(15),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: const [
+        BoxShadow(
+          color: Colors.black26,
+          blurRadius: 10.0,
+          offset: Offset(0, 5),
+        ),
+      ],
+    ),
+    child: SizedBox(
+      height: MediaQuery.of(context).size.height * 0.6,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: DataTable(
+          columnSpacing: 30,
+          columns: [
+            DataColumn(
+              label: GestureDetector(
+                onTap: () {
+                  _toggleSortOrder("name");
+                },
+                child: Row(
+                  children: [
+                    Text(
+                      'Nome Completo',
+                      style: const TextStyle(color: Colors.black),
                     ),
-                  ),
+                    if (selectedFilter == "name") ...[
+                      Icon(
+                        isNameAscending ? Icons.arrow_upward : Icons.arrow_downward,
+                        size: 16,
+                        color: Colors.black,
+                      ),
+                    ],
+                  ],
                 ),
-                DataColumn(
-                  label: GestureDetector(
-                    onTap: () {
-                      _toggleSortOrder("permission_level");
-                    },
-                    child: Row(
-                      children: [
-                        Text(
-                          'Função',
-                          style: const TextStyle(color: Colors.black),
-                        ),
-                        if (selectedFilter == "permission_level") ...[
-                          Icon(
-                            isPermissionAscending ? Icons.arrow_upward : Icons.arrow_downward,
-                            size: 16,
-                            color: Colors.black,
-                          ),
-                        ],
-                      ],
+              ),
+            ),
+            DataColumn(
+              label: GestureDetector(
+                onTap: () {
+                  _toggleSortOrder("permission_level");
+                },
+                child: Row(
+                  children: [
+                    Text(
+                      'Função',
+                      style: const TextStyle(color: Colors.black),
                     ),
-                  ),
+                    if (selectedFilter == "permission_level") ...[
+                      Icon(
+                        isPermissionAscending ? Icons.arrow_upward : Icons.arrow_downward,
+                        size: 16,
+                        color: Colors.black,
+                      ),
+                    ],
+                  ],
                 ),
-                DataColumn(
-                  label: Container(
-                    alignment: Alignment.centerRight,
-                    child: Text(''),
-                  ),
-                ),
-              ],
-              rows: users
-                  .map((user) => DataRow(cells: [
-                        DataCell(
-                          Text(
-                            limitNameToTwoWords(user['name']),
-                            style: const TextStyle(color: Colors.black),
-                          ),
-                        ),
-                        DataCell(
-                          Text(
-                            getPermissionLevelText(user['permission_level']),
-                            style: const TextStyle(color: Colors.black),
-                          ),
-                        ),
-                        DataCell(
-                          Container(
-                            alignment: Alignment.centerRight,
-                            child: IconButton(
-                              icon: const Icon(Icons.more_vert, color: Colors.black),
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  builder: (context) {
-                                    return Padding(
-                                      padding: const EdgeInsets.all(20),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          ListTile(
-                                            leading: Icon(Icons.edit, color: Colors.black),
-                                            title: Text(
-                                              'Editar Usuário',
-                                              style: TextStyle(color: Colors.black),
-                                            ),
-                                            onTap: () {
-                                              _showEditDialog(user);
-                                            },
-                                          ),
-                                          ListTile(
-                                            leading: Icon(Icons.delete, color: Colors.black),
-                                            title: Text(
-                                              'Deletar Usuário',
-                                              style: TextStyle(color: Colors.black),
-                                            ),
-                                            onTap: () {
-                                              _deleteUser(user['id']);
-                                            },
-                                          ),
-                                        ],
+              ),
+            ),
+            DataColumn(
+              label: Container(
+                alignment: Alignment.centerRight,
+                child: Text(''),
+              ),
+            ),
+          ],
+          rows: users
+              .map((user) => DataRow(cells: [
+                    DataCell(
+                      Text(
+                        limitNameToTwoWords(user['name']),
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    DataCell(
+                      Text(
+                        getPermissionLevelText(user['permission_level']),
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    DataCell(
+                      Container(
+                        alignment: Alignment.centerRight,
+                        child: IconButton(
+                          icon: const Icon(Icons.more_vert, color: Colors.black),
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(20),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      ListTile(
+                                        leading: Icon(Icons.edit, color: Colors.black),
+                                        title: Text(
+                                          'Editar Usuário',
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                        onTap: () {
+                                          _showEditDialog(user);
+                                        },
                                       ),
-                                    );
-                                  },
+                                      ListTile(
+                                        leading: Icon(Icons.delete, color: Colors.black),
+                                        title: Text(
+                                          'Deletar Usuário',
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                        onTap: () {
+                                          _deleteUser(user['id']);
+                                        },
+                                      ),
+                                    ],
+                                  ),
                                 );
                               },
-                            ),
-                          ),
+                            );
+                          },
                         ),
-                      ]))
-                  .toList(),
-            ),
-          ),
+                      ),
+                    ),
+                  ]))
+              .toList(),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   void _showEditDialog(Map<String, dynamic> user) {
     TextEditingController nameController = TextEditingController(text: user['name']);

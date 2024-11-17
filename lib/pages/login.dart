@@ -146,7 +146,7 @@ class _LoginPageState extends State<LoginPage> {
       left: MediaQuery.of(context).size.width * 0.05,
       right: MediaQuery.of(context).size.width * 0.05,
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.5,  // Ajuste o tamanho do container conforme necessário
+        height: MediaQuery.of(context).size.height * 0.4,  // Ajuste o tamanho do container conforme necessário
         decoration: BoxDecoration(
           color: AppColors.auxiliaryColor,
           borderRadius: BorderRadius.circular(15),
@@ -170,7 +170,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             _buildTextField(usernameController, 'Usuário'),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             _buildPasswordField(),
             const SizedBox(height: 10),
             _buildRememberMeCheckbox(),
