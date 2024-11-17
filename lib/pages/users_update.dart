@@ -1,15 +1,19 @@
-import 'imports.dart';
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Para obter o token
 
 class UpdateUser extends StatefulWidget {
-  final int userId;
+  final String currentUsername;  // Alterado para usar username
   final String currentName;
   final int currentPermissionLevel;
   final Function refreshUsers;
 
   const UpdateUser({
     super.key,
-    required this.userId,
+    required this.currentUsername,  // Alterado para usar username
     required this.currentName,
     required this.currentPermissionLevel,
     required this.refreshUsers,
@@ -21,6 +25,7 @@ class UpdateUser extends StatefulWidget {
 
 class _UpdateUserState extends State<UpdateUser> {
   late TextEditingController _nameController;
+  late TextEditingController _usernameController;
   int _selectedPermissionLevel = 1;
   bool _isLoading = false;
   String? _errorMessage;
@@ -29,51 +34,78 @@ class _UpdateUserState extends State<UpdateUser> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.currentName);
+    _usernameController = TextEditingController(text: widget.currentUsername);  // Alterado para username
     _selectedPermissionLevel = widget.currentPermissionLevel;
   }
 
-  Future<void> _updateUser() async {
-    if (_nameController.text.trim().isEmpty) {
-      setState(() {
-        _errorMessage = 'O nome não pode estar vazio.';
-      });
-      return;
-    }
-
+Future<void> _updateUser() async {
+  if (_nameController.text.trim().isEmpty || _usernameController.text.trim().isEmpty) {
     setState(() {
-      _isLoading = true;
-      _errorMessage = null;
+      _errorMessage = 'Nome e Username não podem estar vazios.';
     });
+    return;
+  }
 
-    final url = Uri.parse('${dotenv.env['API_BASE_URL']}/update_user/${widget.userId}');
-    final response = await http.put(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'name': _nameController.text.trim(),
-        'permission_level': _selectedPermissionLevel,
-      }),
-    );
+  setState(() {
+    _isLoading = true;
+    _errorMessage = null;
+  });
 
+  // Obter o token de autenticação
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? token = prefs.getString('token'); // Ou onde o token for armazenado
+
+  if (token == null) {
     setState(() {
+      _errorMessage = 'Token não encontrado. Faça login novamente.';
       _isLoading = false;
     });
-
-    if (response.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Usuário atualizado com sucesso')),
-      );
-      widget.refreshUsers();
-      Navigator.pop(context);
-    } else {
-      setState(() {
-        _errorMessage = 'Erro ao atualizar usuário: ${response.body}';
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_errorMessage!)),
-      );
-    }
+    return;
   }
+
+  final url = Uri.parse('${dotenv.env['API_BASE_URL']}/update_user/${widget.currentUsername}'); // Alterado para usar username
+  final response = await http.put(
+    url,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token', // Adicionando o token ao cabeçalho
+    },
+    body: json.encode({
+      'name': _nameController.text.trim(),
+      'username': _usernameController.text.trim(),
+      'permission_level': _selectedPermissionLevel,
+    }),
+  );
+
+  setState(() {
+    _isLoading = false;
+  });
+
+  if (response.statusCode == 200) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Usuário atualizado com sucesso')),
+    );
+    widget.refreshUsers();
+    Navigator.pop(context);
+  } else if (response.statusCode == 403) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Você não pode alterar seu próprio perfil.')),
+    );
+    Navigator.pop(context); // Fecha a tela e volta para a anterior em caso de erro 403
+  } else if (response.statusCode == 401) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Token inválido ou expirado. Faça login novamente.')),
+    );
+  } else if (response.statusCode == 400) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Nome de usuário já existente, tente outro.')),
+    );
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Erro ao atualizar usuário. Tente novamente mais tarde.')),
+    );
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -83,8 +115,15 @@ class _UpdateUserState extends State<UpdateUser> {
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
+            controller: _usernameController,
+            decoration: const InputDecoration(labelText: 'Username'),
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]'))],
+          ),
+          const SizedBox(height: 10),
+          TextField(
             controller: _nameController,
             decoration: const InputDecoration(labelText: 'Nome Completo'),
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z ]'))],
           ),
           const SizedBox(height: 10),
           DropdownButton<int>(

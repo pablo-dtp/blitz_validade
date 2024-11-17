@@ -1,3 +1,5 @@
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'imports.dart';
 import 'package:http/http.dart' as http;
 
@@ -49,10 +51,22 @@ class _AddUserPageState extends State<AddUserPage> {
   }
 
   Future<void> _addUser() async {
+    // Obter o token de autenticação
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token'); // Token armazenado no SharedPreferences
+
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Token não encontrado. Faça login novamente.')),
+      );
+      return;
+    }
+
     final response = await http.post(
       Uri.parse('${dotenv.env['API_BASE_URL']}/add_user'),
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',  // Adicionando o token no cabeçalho
       },
       body: json.encode({
         'username': usernameController.text.toLowerCase(),
@@ -62,31 +76,31 @@ class _AddUserPageState extends State<AddUserPage> {
       }),
     );
 
-  if (response.statusCode == 200) {
-    final responseBody = json.decode(response.body);
-    final String message = responseBody['message'];  // Mudança aqui, agora verifica 'message'
+    if (response.statusCode == 200) {
+      final responseBody = json.decode(response.body);
+      final String message = responseBody['message'];
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),  // Exibindo mensagem recebida
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
 
-    // Limpar os campos após sucesso
-    usernameController.clear();
-    passwordController.clear();
-    nameController.clear();
-    setState(() {
-      selectedPermissionLevel = null;
-    });
+      // Limpar os campos após sucesso
+      usernameController.clear();
+      passwordController.clear();
+      nameController.clear();
+      setState(() {
+        selectedPermissionLevel = null;
+      });
 
-    Navigator.pop(context, true);
-  } else {
-    final responseBody = json.decode(response.body);
-    final String errorMessage = responseBody['message'];
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Erro: $errorMessage')),
-    );
+      Navigator.pop(context, true);
+    } else {
+      final responseBody = json.decode(response.body);
+      final String errorMessage = responseBody['message'];
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro: $errorMessage')),
+      );
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {

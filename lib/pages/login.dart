@@ -51,9 +51,11 @@ class _LoginPageState extends State<LoginPage> {
     if (response.statusCode == 200) {
       if (mounted) {
         final responseBody = json.decode(response.body);
+        final token = responseBody['token'];  // Aqui, estamos esperando um 'token' no retorno
         final permissionLevel = responseBody['permission_level'];
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('token', token); // Salvar o token
         prefs.setInt('permission_level', permissionLevel);
 
         if (rememberMe) {
