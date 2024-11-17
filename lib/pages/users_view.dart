@@ -22,7 +22,7 @@ class _UserTableState extends State<UserTable> {
   bool isNameAscending = true;
   bool isPermissionAscending = true;
   String? selectedFilter = "name";
-  bool isLoading = true;  // Variável para indicar o estado de carregamento
+  bool isLoading = true;
   String errorMessage = ''; // Mensagem de erro
 
   @override
@@ -126,8 +126,12 @@ class _UserTableState extends State<UserTable> {
   }
 
   Widget _buildUserTable() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double tableWidth = screenWidth * 0.9; // 90% da largura da tela
+    double marginSide = screenWidth * 0.05; // 5% de distância de cada lado
+
     return Container(
-      margin: const EdgeInsets.all(20),
+      margin: EdgeInsets.symmetric(horizontal: marginSide), // 5% de distância de cada lado
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -141,6 +145,7 @@ class _UserTableState extends State<UserTable> {
         ],
       ),
       child: SizedBox(
+        width: tableWidth,
         height: MediaQuery.of(context).size.height * 0.6,
         child: isLoading
             ? Center(child: CircularProgressIndicator()) // Exibe indicador de carregamento
@@ -149,7 +154,7 @@ class _UserTableState extends State<UserTable> {
                 : SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                     child: DataTable(
-                      columnSpacing: 30,
+                      columnSpacing: 20,
                       columns: [
                         DataColumn(
                           label: GestureDetector(
@@ -159,10 +164,10 @@ class _UserTableState extends State<UserTable> {
                             child: Row(
                               children: [
                                 const Text('Nome Completo', style: TextStyle(color: Colors.black)),
-                                if (selectedFilter == "name") ...[
+                                if (selectedFilter == "name") ...[ 
                                   Icon(
                                     isNameAscending ? Icons.arrow_upward : Icons.arrow_downward,
-                                    size: 16,
+                                    size: 10,
                                     color: Colors.black,
                                   ),
                                 ],
@@ -178,10 +183,10 @@ class _UserTableState extends State<UserTable> {
                             child: Row(
                               children: [
                                 const Text('Função', style: TextStyle(color: Colors.black)),
-                                if (selectedFilter == "permission_level") ...[
+                                if (selectedFilter == "permission_level") ...[ 
                                   Icon(
                                     isPermissionAscending ? Icons.arrow_upward : Icons.arrow_downward,
-                                    size: 16,
+                                    size: 10,
                                     color: Colors.black,
                                   ),
                                 ],
@@ -192,7 +197,7 @@ class _UserTableState extends State<UserTable> {
                         DataColumn(
                           label: Container(
                             alignment: Alignment.centerRight,
-                            child: const Text(''),
+                            child: const Text(''), // Coluna sem texto
                           ),
                         ),
                       ],
@@ -215,6 +220,7 @@ class _UserTableState extends State<UserTable> {
                               Container(
                                 alignment: Alignment.centerRight,
                                 child: PopupMenuButton<String>(
+                                  iconSize: 18,  // Tamanho do ícone reduzido
                                   onSelected: (value) {
                                     if (value == 'Editar') {
                                       showDialog(

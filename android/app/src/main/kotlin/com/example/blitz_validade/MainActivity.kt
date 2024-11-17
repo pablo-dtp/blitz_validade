@@ -1,4 +1,4 @@
-package com.example.blitz_validade
+package com.deustepague
 
 import io.flutter.embedding.android.FlutterActivity
 

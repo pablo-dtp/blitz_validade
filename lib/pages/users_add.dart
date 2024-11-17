@@ -1,5 +1,4 @@
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'imports.dart';
 import 'package:http/http.dart' as http;
 
@@ -104,6 +103,16 @@ class _AddUserPageState extends State<AddUserPage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    // Distância de 10% da altura da tela para o botão
+    double containerHeight = screenHeight * 0.4; // Container ocupa 40% da tela
+    double containerTopMargin = screenHeight * 0.15; // Ajusta para ficar mais centralizado
+
+    // Espaçamento fixo de 5px entre os campos
+    double fieldHeight = 60.0;  // Altura fixa para os campos
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primaryColor,
@@ -124,10 +133,9 @@ class _AddUserPageState extends State<AddUserPage> {
         ),
         flexibleSpace: Stack(
           children: [
-            // Logo com 10px de distância do topo
             Positioned(
               top: 10,
-              left: MediaQuery.of(context).size.width * 0.5 - 40, // Ajuste o valor para centralizar a logo
+              left: screenWidth * 0.5 - 40, // Ajuste o valor para centralizar a logo
               child: Image.asset(
                 'assets/logo.png',
                 width: 80,
@@ -137,13 +145,68 @@ class _AddUserPageState extends State<AddUserPage> {
           ],
         ),
       ),
-      body: SingleChildScrollView(
+      body: GestureDetector(
+        onVerticalDragUpdate: (details) {
+          // Bloqueia o movimento vertical
+          return;
+        },
+        onHorizontalDragUpdate: (details) {
+          // Bloqueia o movimento horizontal
+          return;
+        },
         child: Container(
-          height: MediaQuery.of(context).size.height,
+          height: screenHeight,
           decoration: BoxDecoration(color: AppColors.primaryColor),
           child: Stack(
             children: [
-              _buildAddUserForm(),
+              Positioned(
+                top: containerTopMargin,
+                left: screenWidth * 0.1, // 10% da largura
+                right: screenWidth * 0.1, // 10% da largura
+                child: Container(
+                  height: containerHeight,
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: AppColors.auxiliaryColor,
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 10.0,
+                        offset: Offset(0, 15),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      _buildTextField(usernameController, 'Usuário', isUserField: true, fieldHeight: fieldHeight),
+                      const SizedBox(height: 5), // Espaço fixo entre os campos
+                      _buildTextField(passwordController, 'Senha', obscureText: true, fieldHeight: fieldHeight),
+                      const SizedBox(height: 5),
+                      _buildTextField(nameController, 'Nome completo', fieldHeight: fieldHeight),
+                      const SizedBox(height: 5),
+                      _buildPermissionLevelDropdown(fieldHeight),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                top: containerTopMargin + containerHeight + 30, // Espaço fixo de 5px entre o container e o botão
+                left: screenWidth * 0.15,
+                right: screenWidth * 0.15,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    foregroundColor: const Color.fromARGB(255, 255, 0, 0),
+                    shadowColor: (const Color.fromARGB(255, 0, 0, 0)),
+                    elevation: 10,
+                  ),
+                  onPressed: isButtonEnabled ? _addUser : null,
+                  child: const Text("Adicionar Usuário"),
+                ),
+              ),
             ],
           ),
         ),
@@ -151,88 +214,52 @@ class _AddUserPageState extends State<AddUserPage> {
     );
   }
 
-Widget _buildAddUserForm() {
-  double screenHeight = MediaQuery.of(context).size.height;
-  double screenWidth = MediaQuery.of(context).size.width;
-
-  return Positioned(
-    top: screenHeight * 0.2,  // 25% de distância da AppBar
-    left: screenWidth * 0.1,  // 10% de distância da esquerda
-    right: screenWidth * 0.1,  // 10% de distância da direita
-    child: Container(
-      height: screenHeight * 0.415,  // 40% da altura da tela
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: AppColors.auxiliaryColor,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10.0,
-            offset: Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          _buildTextField(usernameController, 'Usuário', isUserField: true),
-          const SizedBox(height: 0),
-          _buildTextField(passwordController, 'Senha', obscureText: true),
-          const SizedBox(height: 0),
-          _buildTextField(nameController, 'Nome completo'),
-          const SizedBox(height: 0),
-          _buildPermissionLevelDropdown(),
-          const SizedBox(height: 0),
-          ElevatedButton(
-            onPressed: isButtonEnabled ? _addUser : null,
-            child: const Text("Adicionar Usuário"),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-  Widget _buildTextField(TextEditingController controller, String label, {bool obscureText = false, bool isUserField = false}) {
+  Widget _buildTextField(TextEditingController controller, String label, {bool obscureText = false, bool isUserField = false, double? fieldHeight}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextField(
-        controller: controller,
-        obscureText: obscureText,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
+      child: SizedBox(
+        height: fieldHeight ?? 60.0, // Usar o valor calculado ou padrão
+        child: TextField(
+          controller: controller,
+          obscureText: obscureText,
+          decoration: InputDecoration(
+            labelText: label,
+            border: const OutlineInputBorder(),
+          ),
+          inputFormatters: isUserField 
+              ? [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]'))]
+              : label == 'Senha'
+                  ? []
+                  : [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z ]'))],
         ),
-        inputFormatters: isUserField 
-            ? [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]'))]
-            : label == 'Senha'
-                ? []
-                : [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z ]'))],
       ),
     );
   }
 
-  Widget _buildPermissionLevelDropdown() {
+  Widget _buildPermissionLevelDropdown(double? fieldHeight) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: DropdownButtonFormField<int>(
-        value: selectedPermissionLevel,
-        decoration: InputDecoration(
-          labelText: 'Nível de permissão',
-          border: const OutlineInputBorder(),
+      child: SizedBox(
+        height: fieldHeight ?? 60.0, // Usar o valor calculado ou padrão
+        child: DropdownButtonFormField<int>(
+          value: selectedPermissionLevel,
+          decoration: InputDecoration(
+            labelText: 'Nível de permissão',
+            border: const OutlineInputBorder(),
+          ),
+          onChanged: (int? newValue) {
+            setState(() {
+              selectedPermissionLevel = newValue;
+              _checkForm();
+            });
+          },
+          items: const [
+            DropdownMenuItem(value: 1, child: Text('Repositor')),
+            DropdownMenuItem(value: 2, child: Text('Gerente')),
+            DropdownMenuItem(value: 3, child: Text('Admin')),
+          ],
+          hint: const Text('Selecione o nível de permissão'),
         ),
-        onChanged: (int? newValue) {
-          setState(() {
-            selectedPermissionLevel = newValue;
-            _checkForm();
-          });
-        },
-        items: const [
-          DropdownMenuItem(value: 1, child: Text('Repositor')),
-          DropdownMenuItem(value: 2, child: Text('Gerente')),
-          DropdownMenuItem(value: 3, child: Text('Admin')),
-        ],
-        hint: const Text('Selecione o nível de permissão'),
       ),
     );
   }
