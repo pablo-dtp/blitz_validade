@@ -19,7 +19,7 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
   String formatDate(String date) {
     try {
       DateTime parsedDate = DateTime.parse(date);
-      DateFormat dateFormat = DateFormat('dd/MM/yyyy');
+      DateFormat dateFormat = DateFormat('dd/MM/yy');
       return dateFormat.format(parsedDate);
     } catch (e) {
       print('Erro ao formatar a data: $e');

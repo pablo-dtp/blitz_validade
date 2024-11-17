@@ -107,7 +107,7 @@ class _AddUserPageState extends State<AddUserPage> {
     double screenWidth = MediaQuery.of(context).size.width;
 
     // Distância de 10% da altura da tela para o botão
-    double containerHeight = screenHeight * 0.4; // Container ocupa 40% da tela
+    double containerHeight = screenHeight * 0.45; // Container ocupa 40% da tela
     double containerTopMargin = screenHeight * 0.15; // Ajusta para ficar mais centralizado
 
     // Espaçamento fixo de 5px entre os campos
