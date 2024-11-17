@@ -237,30 +237,30 @@ class _AddUserPageState extends State<AddUserPage> {
   }
 
   Widget _buildPermissionLevelDropdown(double? fieldHeight) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: SizedBox(
-        height: fieldHeight ?? 60.0, // Usar o valor calculado ou padrão
-        child: DropdownButtonFormField<int>(
-          value: selectedPermissionLevel,
-          decoration: InputDecoration(
-            labelText: 'Nível de permissão',
-            border: const OutlineInputBorder(),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: SizedBox(
+          height: fieldHeight ?? 60.0, // Usar o valor calculado ou padrão
+          child: DropdownButtonFormField<int>(
+            value: selectedPermissionLevel,
+            decoration: InputDecoration(
+              labelText: 'Função',
+              border: const OutlineInputBorder(),
+            ),
+            onChanged: (int? newValue) {
+              setState(() {
+                selectedPermissionLevel = newValue;
+                _checkForm();
+              });
+            },
+            items: const [
+              DropdownMenuItem(value: 1, child: Text('Repositor')),
+              DropdownMenuItem(value: 2, child: Text('Gerente')),
+              DropdownMenuItem(value: 3, child: Text('Admin')),
+            ],
+            hint: const Text('Selecione a função'),
           ),
-          onChanged: (int? newValue) {
-            setState(() {
-              selectedPermissionLevel = newValue;
-              _checkForm();
-            });
-          },
-          items: const [
-            DropdownMenuItem(value: 1, child: Text('Repositor')),
-            DropdownMenuItem(value: 2, child: Text('Gerente')),
-            DropdownMenuItem(value: 3, child: Text('Admin')),
-          ],
-          hint: const Text('Selecione o nível de permissão'),
         ),
-      ),
-    );
-  }
+      );
+    }
 }

@@ -60,9 +60,9 @@ class _HomePageState extends State<HomePage> {
         decoration: const BoxDecoration(color: AppColors.auxiliaryColor),
         child: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(icon: Icon(Icons.add_shopping_cart), label: 'Registrar Validade'),
-            BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Gerenciar Validades'),
-            BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Gerenciar Usuários'),
+            BottomNavigationBarItem(icon: Icon(Icons.add_shopping_cart), label: 'Registrar'),
+            BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Visualizar'),
+            BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Usuários'),
             BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Configurações'),
           ],
           currentIndex: _currentIndex,

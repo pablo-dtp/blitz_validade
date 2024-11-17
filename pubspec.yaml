@@ -35,6 +35,7 @@ dependencies:
   http: ^1.2.2
   shared_preferences: ^2.0.18 # Verifique se está utilizando a versão mais recente
   flutter_dotenv: ^5.0.2
+  dropdown_button2: ^2.2.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -43,6 +44,13 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.1
+
+flutter_icons:
+  android: true
+  ios: false
+  image_path: "assets/logo_completa.png"
+  background_color: "#FF0000"  # Caminho para o seu ícone
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
