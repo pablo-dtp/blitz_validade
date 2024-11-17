@@ -10,13 +10,7 @@ class SettingsPage extends StatelessWidget {
 
   Widget _buildSettingsPage(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: const [AppColors.primaryColor, AppColors.auxiliaryColor],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          stops: const [0.13, 0],
-        ),
+      decoration: BoxDecoration( color: AppColors.auxiliaryColor,
       ),
       child: Column(
         children: [

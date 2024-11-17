@@ -45,7 +45,7 @@ class _UserTableState extends State<UserTable> {
         setState(() {
           users = List<Map<String, dynamic>>.from(responseBody['users']);
           _sortUsers();
-          isLoading = false;  // Dados carregados com sucesso
+          isLoading = false; // Dados carregados com sucesso
         });
       } else {
         setState(() {
@@ -130,154 +130,158 @@ class _UserTableState extends State<UserTable> {
     double tableWidth = screenWidth * 0.9; // 90% da largura da tela
     double marginSide = screenWidth * 0.05; // 5% de distância de cada lado
 
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: marginSide), // 5% de distância de cada lado
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10.0,
-            offset: Offset(0, 5),
-          ),
-        ],
-      ),
-      child: SizedBox(
-        width: tableWidth,
-        height: MediaQuery.of(context).size.height * 0.6,
-        child: isLoading
-            ? Center(child: CircularProgressIndicator()) // Exibe indicador de carregamento
-            : errorMessage.isNotEmpty
-                ? Center(child: Text(errorMessage, style: TextStyle(color: Colors.red)))
-                : SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: DataTable(
-                      columnSpacing: 20,
-                      columns: [
-                        DataColumn(
-                          label: GestureDetector(
-                            onTap: () {
-                              _toggleSortOrder("name");
-                            },
-                            child: Row(
-                              children: [
-                                const Text('Nome Completo', style: TextStyle(color: Colors.black)),
-                                if (selectedFilter == "name") ...[ 
-                                  Icon(
-                                    isNameAscending ? Icons.arrow_upward : Icons.arrow_downward,
-                                    size: 10,
-                                    color: Colors.black,
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: GestureDetector(
-                            onTap: () {
-                              _toggleSortOrder("permission_level");
-                            },
-                            child: Row(
-                              children: [
-                                const Text('Função', style: TextStyle(color: Colors.black)),
-                                if (selectedFilter == "permission_level") ...[ 
-                                  Icon(
-                                    isPermissionAscending ? Icons.arrow_upward : Icons.arrow_downward,
-                                    size: 10,
-                                    color: Colors.black,
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: Container(
-                            alignment: Alignment.centerRight,
-                            child: const Text(''), // Coluna sem texto
-                          ),
-                        ),
-                      ],
-                      rows: users.map((user) {
-                        return DataRow(
-                          cells: [
-                            DataCell(
-                              Text(
-                                limitNameToTwoWords(user['name']),
-                                style: const TextStyle(color: Colors.black),
-                              ),
-                            ),
-                            DataCell(
-                              Text(
-                                getPermissionLevelText(user['permission_level']),
-                                style: const TextStyle(color: Colors.black),
-                              ),
-                            ),
-                            DataCell(
-                              Container(
-                                alignment: Alignment.centerRight,
-                                child: PopupMenuButton<String>(
-                                  iconSize: 18,  // Tamanho do ícone reduzido
-                                  onSelected: (value) {
-                                    if (value == 'Editar') {
-                                      showDialog(
-                                        context: context,
-                                        builder: (_) => UpdateUser(
-                                          currentUsername: user['username'],
-                                          currentName: user['name'],
-                                          currentPermissionLevel: user['permission_level'],
-                                          refreshUsers: () => _fetchUsers(),
-                                        ),
-                                      );
-                                    } else if (value == 'Deletar') {
-                                      showDialog(
-                                        context: context,
-                                        builder: (_) => AlertDialog(
-                                          title: const Text('Confirmar exclusão'),
-                                          content: const Text('Você tem certeza que deseja deletar este usuário?'),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: const Text('Cancelar'),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                                DeleteUser(
-                                                  username: user['username'],  // Usando username agora
-                                                  refreshUsers: () => _fetchUsers(),
-                                                ).deleteUser(context);
-                                              },
-                                              child: const Text('Deletar'),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  itemBuilder: (context) => [
-                                    const PopupMenuItem(
-                                      value: 'Editar',
-                                      child: Text('Editar'),
-                                    ),
-                                    const PopupMenuItem(
-                                      value: 'Deletar',
-                                      child: Text('Deletar'),
+    return RefreshIndicator(
+      onRefresh: _fetchUsers, // Adiciona função de refresh
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: marginSide), // 5% de distância de cada lado
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10.0,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
+        child: SizedBox(
+          width: tableWidth,
+          height: MediaQuery.of(context).size.height * 0.6,
+          child: isLoading
+              ? Center(child: CircularProgressIndicator()) // Exibe indicador de carregamento
+              : errorMessage.isNotEmpty
+                  ? Center(child: Text(errorMessage, style: TextStyle(color: Colors.red)))
+                  : SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(), // Permite o refresh mesmo sem scroll
+                      scrollDirection: Axis.vertical,
+                      child: DataTable(
+                        columnSpacing: 20,
+                        columns: [
+                          DataColumn(
+                            label: GestureDetector(
+                              onTap: () {
+                                _toggleSortOrder("name");
+                              },
+                              child: Row(
+                                children: [
+                                  const Text('Nome Completo', style: TextStyle(color: Colors.black)),
+                                  if (selectedFilter == "name") ...[
+                                    Icon(
+                                      isNameAscending ? Icons.arrow_upward : Icons.arrow_downward,
+                                      size: 10,
+                                      color: Colors.black,
                                     ),
                                   ],
-                                ),
+                                ],
                               ),
                             ),
-                          ],
-                        );
-                      }).toList(),
+                          ),
+                          DataColumn(
+                            label: GestureDetector(
+                              onTap: () {
+                                _toggleSortOrder("permission_level");
+                              },
+                              child: Row(
+                                children: [
+                                  const Text('Função', style: TextStyle(color: Colors.black)),
+                                  if (selectedFilter == "permission_level") ...[
+                                    Icon(
+                                      isPermissionAscending ? Icons.arrow_upward : Icons.arrow_downward,
+                                      size: 10,
+                                      color: Colors.black,
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ),
+                          DataColumn(
+                            label: Container(
+                              alignment: Alignment.centerRight,
+                              child: const Text(''), // Coluna sem texto
+                            ),
+                          ),
+                        ],
+                        rows: users.map((user) {
+                          return DataRow(
+                            cells: [
+                              DataCell(
+                                Text(
+                                  limitNameToTwoWords(user['name']),
+                                  style: const TextStyle(color: Colors.black),
+                                ),
+                              ),
+                              DataCell(
+                                Text(
+                                  getPermissionLevelText(user['permission_level']),
+                                  style: const TextStyle(color: Colors.black),
+                                ),
+                              ),
+                              DataCell(
+                                Container(
+                                  alignment: Alignment.centerRight,
+                                  child: PopupMenuButton<String>(
+                                    iconSize: 18, // Tamanho do ícone reduzido
+                                    onSelected: (value) {
+                                      if (value == 'Editar') {
+                                        showDialog(
+                                          context: context,
+                                          builder: (_) => UpdateUser(
+                                            currentUsername: user['username'],
+                                            currentName: user['name'],
+                                            currentPermissionLevel: user['permission_level'],
+                                            refreshUsers: () => _fetchUsers(),
+                                          ),
+                                        );
+                                      } else if (value == 'Deletar') {
+                                        showDialog(
+                                          context: context,
+                                          builder: (_) => AlertDialog(
+                                            title: const Text('Confirmar exclusão'),
+                                            content: const Text('Você tem certeza que deseja deletar este usuário?'),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text('Cancelar'),
+                                              ),
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                  DeleteUser(
+                                                    username: user['username'], // Usando username agora
+                                                    refreshUsers: () => _fetchUsers(),
+                                                  ).deleteUser(context);
+                                                },
+                                                child: const Text('Deletar'),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    itemBuilder: (context) => [
+                                      const PopupMenuItem(
+                                        value: 'Editar',
+                                        child: Text('Editar'),
+                                      ),
+                                      const PopupMenuItem(
+                                        value: 'Deletar',
+                                        child: Text('Deletar'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        }).toList(),
+                      ),
                     ),
-                  ),
+        ),
       ),
     );
   }

@@ -9,15 +9,30 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  PageController _pageController = PageController();
   int _currentIndex = 0;
-  final List<Widget> _pages = const [
+
+  final List<Widget> _pages = [
     AddProductPage(),
     ManageProductsPage(),
     ManagePeoplePage(),
     SettingsPage(),
   ];
 
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _onPageChanged(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
   void _onItemTapped(int index) async {
+    // Verifica se o usuário tem permissão para acessar a página de "Usuários"
     if (index == 2) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       int permissionLevel = prefs.getInt('permission_level') ?? 0;
@@ -30,6 +45,9 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _currentIndex = index;
     });
+
+    // Navegar para a página desejada
+    _pageController.jumpToPage(index);
   }
 
   void _showPermissionAlert() {
@@ -55,7 +73,11 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _pages),
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: _onPageChanged,
+        children: _pages,
+      ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(color: AppColors.auxiliaryColor),
         child: BottomNavigationBar(

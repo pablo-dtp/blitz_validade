@@ -1,4 +1,5 @@
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'imports.dart';
 
 class AddProductPage extends StatefulWidget {
@@ -87,6 +88,83 @@ class _AddProductPageState extends State<AddProductPage> {
     setState(() {
       _isQuantityFilled = _quantityController.text.isNotEmpty;
     });
+  }
+
+  Future<void> _fetchValidades() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');  // Recuperando o token armazenado
+
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Token não encontrado. Faça login novamente.')) 
+      );
+      return;
+    }
+
+    final url = Uri.parse('${dotenv.env['API_BASE_URL']}/get_validades');  // URL da API
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',  // Adicionando o token no cabeçalho
+        },
+      ); 
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        // Handle the data as needed, e.g., update a list of validades
+        print('Validades fetched successfully: $data');
+      } else {
+        throw Exception('Failed to load validades');
+      }
+    } catch (e) {
+      print('Error fetching validades: $e');
+    }
+  }
+
+  Future<void> _handleProductRegistration() async {
+    final Map<String, dynamic> productData = {
+      'produto': int.tryParse(_productName) ?? 0,
+      'descricao': _productDescription,
+      'codigo_barras': _productBarcode,
+      'quantidade': int.tryParse(_quantityController.text) ?? 0,
+      'embalagem': int.tryParse(_packagingController.text) ?? 1,
+      'data_validade': _expiryDate,
+    };
+
+    final response = await http.post(
+      Uri.parse('${dotenv.env['API_BASE_URL']}/add_validade'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(productData),
+    );
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Produto registrado com sucesso!')),
+      );
+      // Limpar os campos após o sucesso
+      setState(() {
+        _barcodeController.clear();
+        _quantityController.clear();
+        _packagingController.clear();
+        _expiryDateController.clear();
+        _productName = '';
+        _productDescription = '';
+        _productBarcode = '';
+        _expiryDate = '';
+        _isProductFound = false;
+        _isQuantityFilled = false;
+        _isDateSelected = false;
+      });
+
+      // Chamar a função de fetchValidades após o registro bem-sucedido
+      await _fetchValidades();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao registrar produto.')),
+      );
+    }
   }
 
   @override
@@ -192,45 +270,7 @@ class _AddProductPageState extends State<AddProductPage> {
                     SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: (_isProductFound && _isQuantityFilled && _isDateSelected)
-                          ? () async {
-                              final Map<String, dynamic> productData = {
-                                'produto': int.tryParse(_productName) ?? 0,
-                                'descricao': _productDescription,
-                                'codigo_barras': _productBarcode,
-                                'quantidade': int.tryParse(_quantityController.text) ?? 0,
-                                'embalagem': int.tryParse(_packagingController.text) ?? 1,
-                                'data_validade': _expiryDate,
-                              };
-
-                              final response = await http.post(
-                                Uri.parse('${dotenv.env['API_BASE_URL']}/add_validade'),
-                                headers: {'Content-Type': 'application/json'},
-                                body: json.encode(productData),
-                              );
-
-                              if (response.statusCode == 200) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Produto registrado com sucesso!')),
-                                );
-                                setState(() {
-                                  _barcodeController.clear();
-                                  _quantityController.clear();
-                                  _packagingController.clear();
-                                  _expiryDateController.clear();
-                                  _productName = '';
-                                  _productDescription = '';
-                                  _productBarcode = '';
-                                  _expiryDate = '';
-                                  _isProductFound = false;
-                                  _isQuantityFilled = false;
-                                  _isDateSelected = false;
-                                });
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Erro ao registrar produto.')),
-                                );
-                              }
-                          }
+                          ? _handleProductRegistration
                           : null,
                       style: ElevatedButton.styleFrom(
                         minimumSize: Size(double.infinity, 50),
